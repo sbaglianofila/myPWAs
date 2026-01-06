@@ -8,6 +8,8 @@
   <style>
     body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
   </style>
+  <link rel="manifest" href="manifest.json">
+  <!--meta name="theme-color" content="#7c3aed"-->
 </head>
 <body>
   <div id="root"></div>
@@ -213,6 +215,13 @@
 
       ReactDOM.render(React.createElement(YahtzeeGame), document.getElementById('root'));
     });
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
   </script>
 </body>
 </html>
