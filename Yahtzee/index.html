@@ -1,1 +1,219 @@
-x
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yahtzee Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Carica React e ReactDOM -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- App JavaScript -->
+  <script>
+    // Aspetta che React sia caricato
+    window.addEventListener('load', function() {
+      const { useState, createElement: h } = React;
+
+      function YahtzeeGame() {
+        const [dice, setDice] = useState([1, 2, 3, 4, 5]);
+        const [locked, setLocked] = useState([false, false, false, false, false]);
+        const [rollsLeft, setRollsLeft] = useState(3);
+        const [scores, setScores] = useState({
+          ones: null, twos: null, threes: null, fours: null, fives: null, sixes: null,
+          threeOfKind: null, fourOfKind: null, fullHouse: null,
+          smallStraight: null, largeStraight: null, yahtzee: null, chance: null
+        });
+
+        const rollDice = () => {
+          if (rollsLeft > 0) {
+            setDice(dice.map((die, i) => locked[i] ? die : Math.floor(Math.random() * 6) + 1));
+            setRollsLeft(rollsLeft - 1);
+          }
+        };
+
+        const toggleLock = (index) => {
+          if (rollsLeft < 3) {
+            const newLocked = [...locked];
+            newLocked[index] = !newLocked[index];
+            setLocked(newLocked);
+          }
+        };
+
+        const calculateScore = (category) => {
+          const counts = Array(7).fill(0);
+          dice.forEach(die => counts[die]++);
+          const sorted = [...dice].sort((a, b) => a - b);
+
+          switch(category) {
+            case 'ones': return dice.filter(d => d === 1).length * 1;
+            case 'twos': return dice.filter(d => d === 2).length * 2;
+            case 'threes': return dice.filter(d => d === 3).length * 3;
+            case 'fours': return dice.filter(d => d === 4).length * 4;
+            case 'fives': return dice.filter(d => d === 5).length * 5;
+            case 'sixes': return dice.filter(d => d === 6).length * 6;
+            case 'threeOfKind': return counts.some(c => c >= 3) ? dice.reduce((a, b) => a + b) : 0;
+            case 'fourOfKind': return counts.some(c => c >= 4) ? dice.reduce((a, b) => a + b) : 0;
+            case 'fullHouse': return (counts.includes(3) && counts.includes(2)) ? 25 : 0;
+            case 'smallStraight':
+              const smallStraights = [[1,2,3,4], [2,3,4,5], [3,4,5,6]];
+              return smallStraights.some(st => st.every(n => sorted.includes(n))) ? 30 : 0;
+            case 'largeStraight':
+              const largeStraights = [[1,2,3,4,5], [2,3,4,5,6]];
+              return largeStraights.some(st => JSON.stringify(sorted) === JSON.stringify(st)) ? 40 : 0;
+            case 'yahtzee': return counts.some(c => c === 5) ? 50 : 0;
+            case 'chance': return dice.reduce((a, b) => a + b);
+            default: return 0;
+          }
+        };
+
+        const selectScore = (category) => {
+          if (scores[category] === null && rollsLeft < 3) {
+            const score = calculateScore(category);
+            setScores({...scores, [category]: score});
+            setRollsLeft(3);
+            setLocked([false, false, false, false, false]);
+          }
+        };
+
+        const upperScore = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes']
+          .reduce((sum, cat) => sum + (scores[cat] || 0), 0);
+        const bonus = upperScore >= 63 ? 35 : 0;
+        const lowerScore = ['threeOfKind', 'fourOfKind', 'fullHouse', 'smallStraight', 'largeStraight', 'yahtzee', 'chance']
+          .reduce((sum, cat) => sum + (scores[cat] || 0), 0);
+        const totalScore = upperScore + bonus + lowerScore;
+
+        const gameOver = Object.values(scores).every(s => s !== null);
+
+        const resetGame = () => {
+          setDice([1, 2, 3, 4, 5]);
+          setLocked([false, false, false, false, false]);
+          setRollsLeft(3);
+          setScores({
+            ones: null, twos: null, threes: null, fours: null, fives: null, sixes: null,
+            threeOfKind: null, fourOfKind: null, fullHouse: null,
+            smallStraight: null, largeStraight: null, yahtzee: null, chance: null
+          });
+        };
+
+        const ScoreRow = ({ label, category, description }) =>
+          h('div', {
+            onClick: () => selectScore(category),
+            className: `flex justify-between items-center p-3 rounded border ${
+              scores[category] !== null
+                ? 'bg-gray-100 border-gray-300'
+                : rollsLeft < 3
+                  ? 'bg-blue-50 border-blue-300 cursor-pointer hover:bg-blue-100'
+                  : 'bg-gray-50 border-gray-200'
+            }`
+          },
+            h('div', null,
+              h('div', { className: 'font-semibold' }, label),
+              h('div', { className: 'text-xs text-gray-600' }, description)
+            ),
+            h('div', { className: 'text-xl font-bold' },
+              scores[category] !== null ? scores[category] : (rollsLeft < 3 ? calculateScore(category) : '-')
+            )
+          );
+
+        return h('div', { className: 'min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-4' },
+          h('div', { className: 'max-w-4xl mx-auto' },
+            h('div', { className: 'bg-white rounded-xl shadow-2xl p-6 mb-6' },
+              h('div', { className: 'flex items-center justify-between mb-6' },
+                h('h1', { className: 'text-4xl font-bold text-purple-800 flex items-center gap-2' }, 'Yahtzee'),
+                h('div', { className: 'text-right' },
+                  h('div', { className: 'text-sm text-gray-600' }, 'Lanci rimasti'),
+                  h('div', { className: 'text-3xl font-bold text-purple-800' }, rollsLeft)
+                )
+              ),
+              h('div', { className: 'flex justify-center gap-4 mb-6' },
+                dice.map((die, i) =>
+                  h('div', {
+                    key: i,
+                    onClick: () => toggleLock(i),
+                    className: `w-20 h-20 rounded-lg flex items-center justify-center text-4xl font-bold cursor-pointer transition-all transform hover:scale-105 ${
+                      locked[i] ? 'bg-yellow-400 shadow-lg' : 'bg-white border-4 border-purple-300 shadow-md'
+                    }`
+                  }, die)
+                )
+              ),
+              h('div', { className: 'flex gap-4 justify-center' },
+                h('button', {
+                  onClick: rollDice,
+                  disabled: rollsLeft === 0,
+                  className: `px-8 py-3 rounded-lg font-bold text-lg ${
+                    rollsLeft > 0
+                      ? 'bg-purple-600 text-white hover:bg-purple-700 shadow-lg'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`
+                }, 'Lancia i dadi'),
+                gameOver && h('button', {
+                  onClick: resetGame,
+                  className: 'px-8 py-3 rounded-lg font-bold text-lg bg-green-600 text-white hover:bg-green-700 shadow-lg'
+                }, 'Nuova Partita')
+              )
+            ),
+            h('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-6' },
+              h('div', { className: 'bg-white rounded-xl shadow-xl p-6' },
+                h('h2', { className: 'text-2xl font-bold text-purple-800 mb-4' }, 'Sezione Superiore'),
+                h('div', { className: 'space-y-2' },
+                  h(ScoreRow, { label: 'Uno', category: 'ones', description: 'Somma degli 1' }),
+                  h(ScoreRow, { label: 'Due', category: 'twos', description: 'Somma dei 2' }),
+                  h(ScoreRow, { label: 'Tre', category: 'threes', description: 'Somma dei 3' }),
+                  h(ScoreRow, { label: 'Quattro', category: 'fours', description: 'Somma dei 4' }),
+                  h(ScoreRow, { label: 'Cinque', category: 'fives', description: 'Somma dei 5' }),
+                  h(ScoreRow, { label: 'Sei', category: 'sixes', description: 'Somma dei 6' })
+                ),
+                h('div', { className: 'mt-4 pt-4 border-t-2 border-purple-300' },
+                  h('div', { className: 'flex justify-between font-bold' },
+                    h('span', null, 'Totale superiore:'),
+                    h('span', null, upperScore)
+                  ),
+                  h('div', { className: 'flex justify-between text-sm text-gray-600' },
+                    h('span', null, 'Bonus (=63):'),
+                    h('span', null, bonus)
+                  )
+                )
+              ),
+              h('div', { className: 'bg-white rounded-xl shadow-xl p-6' },
+                h('h2', { className: 'text-2xl font-bold text-purple-800 mb-4' }, 'Sezione Inferiore'),
+                h('div', { className: 'space-y-2' },
+                  h(ScoreRow, { label: 'Tris', category: 'threeOfKind', description: 'Somma se 3+ uguali' }),
+                  h(ScoreRow, { label: 'Poker', category: 'fourOfKind', description: 'Somma se 4+ uguali' }),
+                  h(ScoreRow, { label: 'Full', category: 'fullHouse', description: 'Tris + coppia = 25' }),
+                  h(ScoreRow, { label: 'Scala corta', category: 'smallStraight', description: '4 consecutivi = 30' }),
+                  h(ScoreRow, { label: 'Scala lunga', category: 'largeStraight', description: '5 consecutivi = 40' }),
+                  h(ScoreRow, { label: 'Yahtzee', category: 'yahtzee', description: '5 uguali = 50' }),
+                  h(ScoreRow, { label: 'Chance', category: 'chance', description: 'Somma totale' })
+                ),
+                h('div', { className: 'mt-4 pt-4 border-t-2 border-purple-300' },
+                  h('div', { className: 'flex justify-between font-bold' },
+                    h('span', null, 'Totale inferiore:'),
+                    h('span', null, lowerScore)
+                  )
+                )
+              )
+            ),
+            h('div', { className: 'bg-white rounded-xl shadow-xl p-6 mt-6' },
+              h('div', { className: 'flex justify-between items-center' },
+                h('span', { className: 'text-2xl font-bold text-purple-800' }, 'PUNTEGGIO TOTALE'),
+                h('span', { className: 'text-4xl font-bold text-purple-800' }, totalScore)
+              )
+            )
+          )
+        );
+      }
+
+      ReactDOM.render(React.createElement(YahtzeeGame), document.getElementById('root'));
+    });
+  </script>
+</body>
+</html>
+
