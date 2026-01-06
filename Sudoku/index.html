@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudoku</title>
+
+<style>
+:root {
+  --bg: #f4f6f8;
+  --cell: #ffffff;
+  --fixed: #ccddff;
+  --selected: #ffe6cc;
+  --border: #222;
+}
+
+body {
+  margin: 0;
+  padding: 12px;
+  background: var(--bg);
+  font-family: system-ui, sans-serif;
+  text-align: center;
+}
+
+h1 {
+  margin: 8px 0;
+}
+
+/* --- BOARD --- */
+#board {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  width: 360px;
+  max-width: 95vw;
+  margin: 12px auto;
+  border: 3px solid var(--border);
+  background: var(--border);
+}
+
+.cell {
+  aspect-ratio: 1;
+  background: var(--cell);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid #bbb;
+}
+
+.cell.fixed {
+  background: var(--fixed);
+  font-weight: 700;
+}
+
+.cell.selected {
+  background: var(--selected);
+}
+
+/* Bordi blocchi 3x3 */
+.cell:nth-child(3n) { border-right: 2px solid var(--border); }
+.cell:nth-child(9n) { border-right: 1px solid #bbb; }
+
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54) {
+  border-bottom: 2px solid var(--border);
+}
+
+/* NOTE */
+.notes {
+  position: absolute;
+  inset: 2px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  font-size: 0.55rem;
+  color: #555;
+}
+
+/* --- CONTROLS --- */
+.controls, .numbers {
+  max-width: 360px;
+  margin: 8px auto;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+button, select {
+  flex: 1 1 30%;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  background: #007aff;
+  color: #fff;
+}
+
+button.secondary {
+  background: #ffa64d;
+}
+
+button:active {
+  transform: scale(0.96);
+}
+</style>
+  <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+
+<h1>Sudoku</h1>
+
+<div class="controls">
+  <select id="level">
+    <option value="easy">Facile</option>
+    <option value="medium">Medio</option>
+    <option value="hard">Difficile</option>
+  </select>
+  <button onclick="newGame()">Nuovo</button>
+  <button onclick="solve()">Risolvi</button>
+  <button class="secondary" onclick="clearCell()">Cancella</button>
+  <button class="secondary" onclick="toggleNotes()">Note: OFF</button>
+</div>
+
+<div id="board"></div>
+
+<div class="numbers">
+  <button onclick="inputNumber(1)">1</button>
+  <button onclick="inputNumber(2)">2</button>
+  <button onclick="inputNumber(3)">3</button>
+  <button onclick="inputNumber(4)">4</button>
+  <button onclick="inputNumber(5)">5</button>
+  <button onclick="inputNumber(6)">6</button>
+  <button onclick="inputNumber(7)">7</button>
+  <button onclick="inputNumber(8)">8</button>
+  <button onclick="inputNumber(9)">9</button>
+</div>
+
+<script>
+let board = [];
+let solution = [];
+let fixed = [];
+let notes = Array(81).fill(null).map(() => new Set());
+let selected = null;
+let notesMode = false;
+
+const boardEl = document.getElementById("board");
+
+/* ---------- GAME ---------- */
+
+function newGame() {
+  solution = generateSolved();
+  board = [...solution];
+  removeCells();
+  fixed = board.map(v => v !== 0);
+  notes = Array(81).fill(null).map(() => new Set());
+  selected = null;
+  draw();
+}
+
+function draw() {
+  boardEl.innerHTML = "";
+  board.forEach((v, i) => {
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    if (fixed[i]) cell.classList.add("fixed");
+    if (i === selected) cell.classList.add("selected");
+    cell.onclick = () => select(i);
+
+    if (v !== 0) {
+      cell.textContent = v;
+    } else {
+      const n = document.createElement("div");
+      n.className = "notes";
+      notes[i].forEach(x => {
+        const s = document.createElement("span");
+        s.textContent = x;
+        n.appendChild(s);
+      });
+      cell.appendChild(n);
+    }
+
+    boardEl.appendChild(cell);
+  });
+}
+
+function select(i) {
+  if (fixed[i]) return;
+  selected = i;
+  draw();
+}
+
+function inputNumber(n) {
+  if (selected === null) return;
+
+  if (notesMode) {
+    notes[selected].has(n)
+      ? notes[selected].delete(n)
+      : notes[selected].add(n);
+  } else {
+    board[selected] = n;
+    notes[selected].clear();
+  }
+  draw();
+}
+
+function clearCell() {
+  if (selected === null) return;
+  board[selected] = 0;
+  notes[selected].clear();
+  draw();
+}
+
+function toggleNotes() {
+  notesMode = !notesMode;
+  document.querySelectorAll(".secondary")[1].textContent =
+    "Note: " + (notesMode ? "ON" : "OFF");
+}
+
+function solve() {
+  board = [...solution];
+  notes.forEach(s => s.clear());
+  draw();
+}
+
+/* ---------- SUDOKU ENGINE ---------- */
+
+function generateSolved() {
+  const b = Array(81).fill(0);
+  solveBoard(b);
+  return b;
+}
+
+function removeCells() {
+  const level = document.getElementById("level").value;
+  const remove = level === "easy" ? 40 : level === "medium" ? 50 : 60;
+
+  let count = 0;
+  while (count < remove) {
+    const i = Math.floor(Math.random() * 81);
+    if (board[i] !== 0) {
+      board[i] = 0;
+      count++;
+    }
+  }
+}
+
+function solveBoard(b) {
+  for (let i = 0; i < 81; i++) {
+    if (b[i] === 0) {
+      for (let n of shuffle([1,2,3,4,5,6,7,8,9])) {
+        if (valid(b, i, n)) {
+          b[i] = n;
+          if (solveBoard(b)) return true;
+          b[i] = 0;
+        }
+      }
+      return false;
+    }
+  }
+  return true;
+}
+
+function valid(b, i, n) {
+  const r = Math.floor(i / 9) * 9;
+  const c = i % 9;
+
+  for (let x = 0; x < 9; x++) {
+    if (b[r + x] === n) return false;
+    if (b[c + x * 9] === n) return false;
+  }
+
+  const br = Math.floor(r / 27) * 27 + Math.floor(c / 3) * 3;
+  for (let x = 0; x < 3; x++)
+    for (let y = 0; y < 3; y++)
+      if (b[br + x * 9 + y] === n) return false;
+
+  return true;
+}
+
+function shuffle(a) {
+  return a.sort(() => Math.random() - 0.5);
+}
+
+newGame();
+</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+
+</body>
+</html>
