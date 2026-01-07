@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mastermind</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .rules {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .secret-code {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        .peg {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #333;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .peg:hover {
+            transform: scale(1.1);
+        }
+
+        .peg.hidden {
+            background: #999 !important;
+            cursor: default;
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.15);
+            border-color: #333;
+        }
+
+        .color-option.selected {
+            border-color: #333;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .attempts {
+            margin-top: 20px;
+        }
+
+        .attempt-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        .attempt-pegs {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .feedback {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3px;
+            margin-left: 10px;
+        }
+
+        .feedback-peg {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 1px solid #999;
+        }
+
+        .feedback-peg.black {
+            background: black;
+        }
+
+        .feedback-peg.white {
+            background: white;
+        }
+
+        .feedback-peg.empty {
+            background: #ddd;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .check-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .check-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .new-game-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .new-game-btn:hover {
+            background: #45a049;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .message.win {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .message.lose {
+            background: #f44336;
+            color: white;
+        }
+
+        .attempt-number {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 30px;
+        }
+    </style>
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="container">
+        <h1>Mastermind</h1>
+
+        <div class="rules">
+            <strong>Regole:</strong> Indovina il codice segreto di 4 colori in 10 tentativi.<br>
+            • Nero = colore giusto nella posizione giusta<br>
+            • Bianco = colore giusto ma posizione sbagliata
+        </div>
+
+        <div class="secret-code" id="secretCode">
+            <div class="peg hidden"></div>
+            <div class="peg hidden"></div>
+            <div class="peg hidden"></div>
+            <div class="peg hidden"></div>
+        </div>
+
+        <h3 style="text-align: center; color: #667eea; margin-bottom: 15px;">Scegli il tuo codice:</h3>
+
+        <div class="color-palette" id="colorPalette"></div>
+
+        <div class="secret-code" id="currentGuess">
+            <div class="peg" style="background: #ddd;"></div>
+            <div class="peg" style="background: #ddd;"></div>
+            <div class="peg" style="background: #ddd;"></div>
+            <div class="peg" style="background: #ddd;"></div>
+        </div>
+
+        <div class="buttons">
+            <button class="check-btn" id="checkBtn" onclick="checkGuess()">Verifica</button>
+            <button class="new-game-btn" onclick="newGame()">Nuova Partita</button>
+        </div>
+
+        <div id="message"></div>
+
+        <div class="attempts" id="attempts"></div>
+    </div>
+
+    <script>
+        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
+        let secretCode = [];
+        let currentGuess = [null, null, null, null];
+        let selectedColor = null;
+        let attempts = [];
+        let gameOver = false;
+
+        function init() {
+            generateSecretCode();
+            renderColorPalette();
+            updateCurrentGuess();
+        }
+
+        function generateSecretCode() {
+            secretCode = [];
+            for (let i = 0; i < 4; i++) {
+                secretCode.push(colors[Math.floor(Math.random() * colors.length)]);
+            }
+        }
+
+        function renderColorPalette() {
+            const palette = document.getElementById('colorPalette');
+            palette.innerHTML = '';
+            colors.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'color-option';
+                div.style.background = color;
+                div.onclick = () => selectColor(color, div);
+                palette.appendChild(div);
+            });
+        }
+
+        function selectColor(color, element) {
+            document.querySelectorAll('.color-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            selectedColor = color;
+        }
+
+        function updateCurrentGuess() {
+            const guessDiv = document.getElementById('currentGuess');
+            const pegs = guessDiv.querySelectorAll('.peg');
+            pegs.forEach((peg, i) => {
+                peg.style.background = currentGuess[i] || '#ddd';
+                peg.onclick = () => {
+                    if (!gameOver && selectedColor) {
+                        currentGuess[i] = selectedColor;
+                        updateCurrentGuess();
+                        checkIfComplete();
+                    }
+                };
+            });
+        }
+
+        function checkIfComplete() {
+            const complete = currentGuess.every(c => c !== null);
+            document.getElementById('checkBtn').disabled = !complete || gameOver;
+        }
+
+        function checkGuess() {
+            if (gameOver) return;
+
+            const feedback = getFeedback(currentGuess, secretCode);
+            attempts.push({guess: [...currentGuess], feedback});
+
+            renderAttempts();
+
+            if (feedback.black === 4) {
+                endGame(true);
+            } else if (attempts.length >= 10) {
+                endGame(false);
+            } else {
+                currentGuess = [null, null, null, null];
+                updateCurrentGuess();
+                checkIfComplete();
+            }
+        }
+
+        function getFeedback(guess, secret) {
+            let black = 0;
+            let white = 0;
+            const secretCopy = [...secret];
+            const guessCopy = [...guess];
+
+            for (let i = 0; i < 4; i++) {
+                if (guessCopy[i] === secretCopy[i]) {
+                    black++;
+                    secretCopy[i] = null;
+                    guessCopy[i] = null;
+                }
+            }
+
+            for (let i = 0; i < 4; i++) {
+                if (guessCopy[i] !== null) {
+                    const index = secretCopy.indexOf(guessCopy[i]);
+                    if (index !== -1) {
+                        white++;
+                        secretCopy[index] = null;
+                    }
+                }
+            }
+
+            return {black, white};
+        }
+
+        function renderAttempts() {
+            const attemptsDiv = document.getElementById('attempts');
+            attemptsDiv.innerHTML = '<h3 style="color: #667eea; margin-bottom: 10px;">Tentativi:</h3>';
+
+            attempts.forEach((attempt, index) => {
+                const row = document.createElement('div');
+                row.className = 'attempt-row';
+
+                const attemptNum = document.createElement('div');
+                attemptNum.className = 'attempt-number';
+                attemptNum.textContent = `${index + 1}.`;
+                row.appendChild(attemptNum);
+
+                const pegsDiv = document.createElement('div');
+                pegsDiv.className = 'attempt-pegs';
+                attempt.guess.forEach(color => {
+                    const peg = document.createElement('div');
+                    peg.className = 'peg';
+                    peg.style.background = color;
+                    peg.style.width = '40px';
+                    peg.style.height = '40px';
+                    peg.style.cursor = 'default';
+                    pegsDiv.appendChild(peg);
+                });
+                row.appendChild(pegsDiv);
+
+                const feedback = document.createElement('div');
+                feedback.className = 'feedback';
+                for (let i = 0; i < attempt.feedback.black; i++) {
+                    const peg = document.createElement('div');
+                    peg.className = 'feedback-peg black';
+                    feedback.appendChild(peg);
+                }
+                for (let i = 0; i < attempt.feedback.white; i++) {
+                    const peg = document.createElement('div');
+                    peg.className = 'feedback-peg white';
+                    feedback.appendChild(peg);
+                }
+                for (let i = attempt.feedback.black + attempt.feedback.white; i < 4; i++) {
+                    const peg = document.createElement('div');
+                    peg.className = 'feedback-peg empty';
+                    feedback.appendChild(peg);
+                }
+                row.appendChild(feedback);
+
+                attemptsDiv.appendChild(row);
+            });
+        }
+
+        function endGame(won) {
+            gameOver = true;
+            document.getElementById('checkBtn').disabled = true;
+
+            const secretDiv = document.getElementById('secretCode');
+            const pegs = secretDiv.querySelectorAll('.peg');
+            pegs.forEach((peg, i) => {
+                peg.style.background = secretCode[i];
+                peg.classList.remove('hidden');
+            });
+
+            const message = document.getElementById('message');
+            if (won) {
+                message.className = 'message win';
+                message.textContent = `?? Hai vinto in ${attempts.length} ${attempts.length === 1 ? 'tentativo' : 'tentativi'}!`;
+            } else {
+                message.className = 'message lose';
+                message.textContent = '?? Hai perso! Il codice era quello sopra.';
+            }
+        }
+
+        function newGame() {
+            gameOver = false;
+            attempts = [];
+            currentGuess = [null, null, null, null];
+            selectedColor = null;
+            document.getElementById('message').innerHTML = '';
+            document.getElementById('attempts').innerHTML = '';
+
+            const secretDiv = document.getElementById('secretCode');
+            const pegs = secretDiv.querySelectorAll('.peg');
+            pegs.forEach(peg => {
+                peg.classList.add('hidden');
+                peg.style.background = '#999';
+            });
+
+            document.querySelectorAll('.color-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+
+            init();
+        }
+
+        init();
+    </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
