@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gioco del 15</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: #667eea;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .game-board {
+            display: grid;
+            gap: 5px;
+            margin: 0 auto;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 10px;
+        }
+
+        .game-board.size-4 {
+            grid-template-columns: repeat(4, 1fr);
+            width: fit-content;
+        }
+
+        .game-board.size-5 {
+            grid-template-columns: repeat(5, 1fr);
+            width: fit-content;
+        }
+
+        .tile {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .tile:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .tile.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        .tile.empty:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .size-4 .tile {
+            width: 100px;
+            height: 100px;
+        }
+
+        .size-5 .tile {
+            width: 80px;
+            height: 80px;
+            font-size: 20px;
+        }
+
+        .win-message {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            color: #155724;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .win-message.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .size-4 .tile {
+                width: 70px;
+                height: 70px;
+                font-size: 20px;
+            }
+
+            .size-5 .tile {
+                width: 55px;
+                height: 55px;
+                font-size: 16px;
+            }
+        }
+    </style>
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="container">
+        <h1>Gioco del 15</h1>
+
+        <div class="controls">
+            <button onclick="game.setSize(4)">4x4</button>
+            <button onclick="game.setSize(5)">5x5</button>
+            <button onclick="game.shuffle()">Mescola</button>
+            <button onclick="game.reset()">Reset</button>
+        </div>
+
+        <div class="info">
+            <div class="info-item">
+                <div class="info-label">Mosse</div>
+                <div class="info-value" id="moves">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Tempo</div>
+                <div class="info-value" id="timer">00:00</div>
+            </div>
+        </div>
+
+        <div id="board" class="game-board size-4"></div>
+
+        <div id="win-message" class="win-message">
+             Complimenti! Hai risolto il puzzle!
+        </div>
+    </div>
+
+    <script>
+        const game = {
+            size: 4,
+            tiles: [],
+            emptyPos: null,
+            moves: 0,
+            timer: 0,
+            timerInterval: null,
+            isStarted: false,
+
+            init() {
+                this.reset();
+            },
+
+            setSize(size) {
+                this.size = size;
+                this.reset();
+                document.getElementById('board').className = `game-board size-${size}`;
+            },
+
+            reset() {
+                this.moves = 0;
+                this.timer = 0;
+                this.isStarted = false;
+                this.stopTimer();
+                this.updateDisplay();
+                this.createTiles();
+                this.render();
+                document.getElementById('win-message').classList.remove('show');
+            },
+
+            createTiles() {
+                const total = this.size * this.size;
+                this.tiles = Array.from({ length: total }, (_, i) => i);
+                this.emptyPos = total - 1;
+            },
+
+            shuffle() {
+                this.reset();
+                // Esegui 500 mosse casuali valide per assicurare uno stato risolvibile
+                for (let i = 0; i < 500; i++) {
+                    const moves = this.getValidMoves();
+                    const randomMove = moves[Math.floor(Math.random() * moves.length)];
+                    this.swapTiles(this.emptyPos, randomMove);
+                }
+                this.moves = 0;
+                this.updateDisplay();
+                this.render();
+            },
+
+            getValidMoves() {
+                const moves = [];
+                const row = Math.floor(this.emptyPos / this.size);
+                const col = this.emptyPos % this.size;
+
+                if (row > 0) moves.push(this.emptyPos - this.size); // su
+                if (row < this.size - 1) moves.push(this.emptyPos + this.size); // giù
+                if (col > 0) moves.push(this.emptyPos - 1); // sinistra
+                if (col < this.size - 1) moves.push(this.emptyPos + 1); // destra
+
+                return moves;
+            },
+
+            swapTiles(pos1, pos2) {
+                [this.tiles[pos1], this.tiles[pos2]] = [this.tiles[pos2], this.tiles[pos1]];
+                this.emptyPos = pos2;
+            },
+
+            moveTile(pos) {
+                if (!this.isStarted) {
+                    this.startTimer();
+                    this.isStarted = true;
+                }
+
+                const validMoves = this.getValidMoves();
+                if (validMoves.includes(pos)) {
+                    this.swapTiles(this.emptyPos, pos);
+                    this.moves++;
+                    this.updateDisplay();
+                    this.render();
+                    this.checkWin();
+                }
+            },
+
+            checkWin() {
+                const total = this.size * this.size;
+                for (let i = 0; i < total - 1; i++) {
+                    if (this.tiles[i] !== i) return false;
+                }
+                this.stopTimer();
+                document.getElementById('win-message').classList.add('show');
+                return true;
+            },
+
+            startTimer() {
+                this.timerInterval = setInterval(() => {
+                    this.timer++;
+                    this.updateDisplay();
+                }, 1000);
+            },
+
+            stopTimer() {
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+            },
+
+            updateDisplay() {
+                document.getElementById('moves').textContent = this.moves;
+                const minutes = Math.floor(this.timer / 60).toString().padStart(2, '0');
+                const seconds = (this.timer % 60).toString().padStart(2, '0');
+                document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+            },
+
+            render() {
+                const board = document.getElementById('board');
+                board.innerHTML = '';
+
+                this.tiles.forEach((tile, pos) => {
+                    const div = document.createElement('div');
+                    div.className = 'tile';
+
+                    if (tile === this.size * this.size - 1) {
+                        div.classList.add('empty');
+                    } else {
+                        div.textContent = tile + 1;
+                        div.onclick = () => this.moveTile(pos);
+                    }
+
+                    board.appendChild(div);
+                });
+            }
+        };
+
+        game.init();
+    </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
