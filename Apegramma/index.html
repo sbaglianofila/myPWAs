@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Esagoni - Parole (IT)</title>
+  <style>
+    :root{
+      --hex-h: 110px;   /* altezza esagono (pointy-top regolare) */
+      --hex-gap: 0px;   /* 0 = lati che si appoggiano perfetti */
+
+      --bg: #0f1220;
+      --card: #171a2b;
+      --text: #e9ecff;
+      --muted: #aeb6e8;
+      --accent: #ffd24a;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background: radial-gradient(1200px 500px at 50% -50%, #2a2f55 0%, var(--bg) 60%);
+      color: var(--text);
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      padding:22px;
+    }
+
+    .app{
+      width:min(820px, 100%);
+      background: color-mix(in srgb, var(--card) 90%, black 10%);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 20px 50px rgba(0,0,0,.35);
+      display:grid;
+      gap:14px;
+    }
+
+    header{
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .title{
+      display:flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .title h1{ font-size:18px; margin:0; }
+    .title .sub{
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .controls{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content:center;
+      flex-wrap: wrap;
+    }
+
+    .pill{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      font-size:13px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .pill strong{ color:var(--text); }
+
+    button{
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:700;
+    }
+    button:hover{ background:rgba(255,255,255,.09); border-color:rgba(255,255,255,.18); }
+
+    .board{
+      position:relative;
+      height:420px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.10));
+      overflow:hidden;
+    }
+    .hex-layer{ position:absolute; inset:0; }
+
+    .hex{
+      position:absolute;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      font-size:30px;
+      letter-spacing:1px;
+      color:#111;
+      user-select:none;
+      cursor:pointer;
+
+      clip-path: polygon(
+        50% 0%,
+        100% 25%,
+        100% 75%,
+        50% 100%,
+        0% 75%,
+        0% 25%
+      );
+
+      background: linear-gradient(180deg, #eef2ff, #b7c0ff);
+      border: 2px solid rgba(255,255,255,.35);
+      box-shadow: 0 10px 25px rgba(0,0,0,.28);
+      transition: transform .08s ease;
+    }
+    .hex:hover{ transform: translateY(-2px) scale(1.02); }
+
+    .hex.center{
+      background: radial-gradient(circle at 30% 25%, #fff3b0 0%, var(--accent) 55%, #ffb703 100%);
+      border-color: rgba(255,210,74,.85);
+    }
+  </style>
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+  <div class="app">
+    <header>
+      <div class="title">
+        <h1>Esagoni</h1>
+        <p class="sub">La lettera centrale è obbligatoria</p>
+      </div>
+
+      <div class="controls">
+        <span class="pill">Lettera obbligatoria: <strong id="mustLetter">—</strong></span>
+        <button id="refreshBtn">🔄 Refresh</button>
+      </div>
+    </header>
+
+    <div class="board">
+      <div class="hex-layer" id="hexLayer"></div>
+    </div>
+  </div>
+
+<script>
+  const VOWELS = ["A","E","I","O","U"];
+  const CONSONANTS = ["B","C","D","F","G","H","L","M","N","P","Q","R","S","T","V","Z"];
+
+  const hexLayer = document.getElementById("hexLayer");
+  const refreshBtn = document.getElementById("refreshBtn");
+  const mustLetterEl = document.getElementById("mustLetter");
+
+  // Centro + 6 vicini (tutti confinanti col centro per lato)
+  const RING = [
+    { key:"center", ox: 0,    oy: 0,   center:true },
+    { key:"E",      ox: 1,    oy: 0 },
+    { key:"W",      ox:-1,    oy: 0 },
+    { key:"NE",     ox: 0.5,  oy:-1 },
+    { key:"NW",     ox:-0.5,  oy:-1 },
+    { key:"SE",     ox: 0.5,  oy: 1 },
+    { key:"SW",     ox:-0.5,  oy: 1 },
+  ];
+
+  let letters = [];
+  let centerLetter = "";
+
+  const randInt = (min,max)=>Math.floor(Math.random()*(max-min+1))+min;
+  const sampleOne = (arr)=>arr[randInt(0,arr.length-1)];
+
+  function pickDistinct(pool, count, forbidden=new Set()){
+    const out=[];
+    const cand = pool.filter(x=>!forbidden.has(x));
+    while(out.length<count && cand.length){
+      out.push(cand.splice(randInt(0,cand.length-1),1)[0]);
+    }
+    return out;
+  }
+
+  function replaceOne(arr, oldVal, newVal){
+    const i = arr.indexOf(oldVal);
+    if(i>=0) arr[i]=newVal;
+  }
+
+  function isValidSet(arr){
+    if(new Set(arr).size !== 7) return false;
+    const v = arr.filter(x=>VOWELS.includes(x)).length;
+    if(!(v===2 || v===3)) return false;
+
+    if(arr.includes("H")){
+      if(!(arr.includes("C") || arr.includes("G"))) return false;
+      if(!(arr.includes("I") || arr.includes("E"))) return false;
+    }
+    if(arr.includes("Q") && !arr.includes("U")) return false;
+    return true;
+  }
+
+  function generateLetters(){
+    for(let t=0;t<2000;t++){
+      const vowelTarget = sampleOne([2,3]);
+      const vv = pickDistinct(VOWELS, vowelTarget);
+      const cc = pickDistinct(CONSONANTS, 7 - vowelTarget, new Set(vv));
+      let arr = [...vv, ...cc];
+
+      // Q -> U
+      if(arr.includes("Q") && !arr.includes("U")){
+        const victim = arr.find(ch => VOWELS.includes(ch) && ch!=="U");
+        if(victim) replaceOne(arr, victim, "U");
+      }
+
+      // H -> (C o G) e almeno I/E tra le vocali
+      if(arr.includes("H")){
+        if(!(arr.includes("C") || arr.includes("G"))){
+          const victim = arr.find(ch => CONSONANTS.includes(ch) && ch!=="H");
+          const add = Math.random()<0.5 ? "C":"G";
+          if(victim && !arr.includes(add)) replaceOne(arr, victim, add);
+          else if(victim){
+            const other = add==="C" ? "G":"C";
+            if(!arr.includes(other)) replaceOne(arr, victim, other);
+          }
+        }
+        if(!(arr.includes("I") || arr.includes("E"))){
+          const victim = arr.find(ch => VOWELS.includes(ch));
+          const opt = ["I","E"].find(x=>!arr.includes(x));
+          if(victim && opt) replaceOne(arr, victim, opt);
+        }
+      }
+
+      if(isValidSet(arr)) return arr.sort(()=>Math.random()-0.5);
+    }
+    return ["A","E","I","C","R","S","T"];
+  }
+
+  function cssPx(name){
+    return parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
+  }
+
+  function renderBoard(){
+    hexLayer.innerHTML = "";
+
+    const board = document.querySelector(".board");
+    const bw = board.clientWidth;
+    const bh = board.clientHeight;
+
+    const H = cssPx("--hex-h");
+    const gap = cssPx("--hex-gap");
+
+    // esagono regolare pointy-top: W = sqrt(3)/2 * H
+    const W = 0.8660254 * H;
+
+    // passi tra centri per confinare per lato
+    const stepX = W + gap;
+    const stepY = 0.75 * H + gap;
+
+    const cx = bw/2;
+    const cy = bh/2;
+
+    const rest = [...letters];
+    const idx = rest.indexOf(centerLetter);
+    if(idx>=0) rest.splice(idx,1);
+
+    const map = { center: centerLetter };
+    let k=0;
+    for(const p of RING){
+      if(p.center) continue;
+      map[p.key] = rest[k++];
+    }
+
+    for(const p of RING){
+      const el = document.createElement("div");
+      el.className = "hex" + (p.center ? " center" : "");
+      el.style.width = `${W}px`;
+      el.style.height = `${H}px`;
+
+      const letter = p.center ? map.center : map[p.key];
+      el.textContent = letter;
+
+      const x = cx + (p.ox * stepX);
+      const y = cy + (p.oy * stepY);
+
+      el.style.left = `${x - W/2}px`;
+      el.style.top  = `${y - H/2}px`;
+
+      hexLayer.appendChild(el);
+    }
+
+    mustLetterEl.textContent = centerLetter;
+  }
+
+  function newScheme(){
+    letters = generateLetters();
+    centerLetter = sampleOne(letters);
+    renderBoard();
+  }
+
+  refreshBtn.addEventListener("click", newScheme);
+  window.addEventListener("resize", renderBoard);
+
+  newScheme();
+</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>

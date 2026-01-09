@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .difficulty {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .diff-btn {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .diff-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .diff-btn:active {
+            transform: scale(0.95);
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            user-select: none;
+        }
+
+        .card.flipped {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .card.matched {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            cursor: default;
+            animation: pulse 0.5s;
+        }
+
+        .card:active:not(.flipped):not(.matched) {
+            transform: scale(0.95);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .restart-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .restart-btn:active {
+            transform: scale(0.95);
+        }
+
+        .victory {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <h1>Memory Game</h1>
+    <div class="difficulty">
+        <button class="diff-btn active" onclick="setDifficulty(4)">4x4</button>
+        <button class="diff-btn" onclick="setDifficulty(5)">5x5</button>
+    </div>
+    <div class="stats">
+        <div>Mosse: <span id="moves">0</span></div>
+        <div>Coppie: <span id="pairs">0</span>/<span id="totalPairs">8</span></div>
+    </div>
+    <div class="game-board" id="gameBoard"></div>
+    <div id="victoryMessage"></div>
+    <button class="restart-btn" onclick="initGame()">Nuova Partita</button>
+
+    <script>
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let moves = 0;
+        let canFlip = true;
+        let gridSize = 4;
+        let totalPairs = 8;
+
+        function setDifficulty(size) {
+            gridSize = size;
+            // Per 4x4 = 8 coppie, per 5x5 = 12 coppie (24 carte + 1 spaiata)
+            totalPairs = size === 4 ? 8 : 12;
+
+            document.querySelectorAll('.diff-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const board = document.getElementById('gameBoard');
+            board.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+
+            initGame();
+        }
+
+        function generateNumbers() {
+            const numbers = [];
+            const used = new Set();
+
+            while (numbers.length < totalPairs) {
+                const num = Math.floor(Math.random() * 100);
+                if (!used.has(num)) {
+                    used.add(num);
+                    numbers.push(num);
+                }
+            }
+
+            let cardArray = [...numbers, ...numbers];
+
+            // Per 5x5, aggiungi un numero extra (spaiato)
+            if (gridSize === 5) {
+                let extraNum;
+                do {
+                    extraNum = Math.floor(Math.random() * 100);
+                } while (used.has(extraNum));
+                cardArray.push(extraNum);
+            }
+
+            return cardArray.sort(() => Math.random() - 0.5);
+        }
+
+        function initGame() {
+            cards = generateNumbers();
+            flippedCards = [];
+            matchedPairs = 0;
+            moves = 0;
+            canFlip = true;
+
+            document.getElementById('moves').textContent = moves;
+            document.getElementById('pairs').textContent = matchedPairs;
+            document.getElementById('totalPairs').textContent = totalPairs;
+            document.getElementById('victoryMessage').textContent = '';
+
+            const board = document.getElementById('gameBoard');
+            board.innerHTML = '';
+
+            cards.forEach((num, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.index = index;
+                card.dataset.value = num;
+                card.textContent = '?';
+                card.onclick = () => flipCard(card);
+                board.appendChild(card);
+            });
+        }
+
+        function flipCard(card) {
+            if (!canFlip || card.classList.contains('flipped') || card.classList.contains('matched')) {
+                return;
+            }
+
+            card.classList.add('flipped');
+            card.textContent = card.dataset.value;
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                canFlip = false;
+                moves++;
+                document.getElementById('moves').textContent = moves;
+
+                setTimeout(checkMatch, 800);
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+
+            if (card1.dataset.value === card2.dataset.value) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                document.getElementById('pairs').textContent = matchedPairs;
+
+                if (matchedPairs === totalPairs) {
+                    document.getElementById('victoryMessage').innerHTML =
+                        `?? Complimenti! Hai vinto in ${moves} mosse! ??`;
+                }
+            } else {
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+                card1.textContent = '?';
+                card2.textContent = '?';
+            }
+
+            flippedCards = [];
+            canFlip = true;
+        }
+
+        initGame();
+    </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
