@@ -19,4 +19,14 @@ Mini Progressive Web Applications
 - Memory
   https://sbaglianofila.github.io/myPWAs/Memory/
 
+- 2048
+  https://sbaglianofila.github.io/myPWAs/2048/
+
+- Simon Says
+  https://sbaglianofila.github.io/myPWAs/Simon/
+
+- Tetris
+  https://sbaglianofila.github.io/myPWAs/Tetris/
+
+
 

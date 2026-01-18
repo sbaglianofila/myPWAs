@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tetris</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #312e81 0%, #be123c 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 448px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 48px;
+      font-weight: bold;
+      color: white;
+      margin-bottom: 8px;
+    }
+
+    .game-container {
+      background: #1f2937;
+      border-radius: 8px;
+      box-shadow: 0 20px 25px rgba(0,0,0,0.5);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .stats {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .stat-box {
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      flex: 1;
+    }
+
+    .stat-box.score { background: #9333ea; }
+    .stat-box.lines { background: #3b82f6; }
+    .stat-box.level { background: #ec4899; }
+
+    .stat-label {
+      font-size: 10px;
+      opacity: 0.8;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .game-area {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .board-container {
+      flex: 1;
+      background: black;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    .board {
+      display: grid;
+      gap: 2px;
+      grid-template-columns: repeat(10, 1fr);
+    }
+
+    .cell {
+      width: 24px;
+      height: 24px;
+      border: 1px solid #374151;
+    }
+
+    .cell-empty { background: #1f2937; }
+    .cell-cyan { background: #22d3ee; }
+    .cell-yellow { background: #facc15; }
+    .cell-purple { background: #a855f7; }
+    .cell-green { background: #4ade80; }
+    .cell-red { background: #ef4444; }
+    .cell-blue { background: #3b82f6; }
+    .cell-orange { background: #fb923c; }
+
+    .sidebar {
+      width: 96px;
+    }
+
+    .next-container {
+      background: #374151;
+      padding: 8px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+
+    .next-label {
+      color: white;
+      font-size: 12px;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .next-grid {
+      display: grid;
+      gap: 2px;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .next-cell {
+      width: 16px;
+      height: 16px;
+    }
+
+    .record-box {
+      background: #7e22ce;
+      color: white;
+      padding: 8px;
+      border-radius: 4px;
+      text-align: center;
+    }
+
+    .record-label {
+      opacity: 0.8;
+      font-size: 10px;
+    }
+
+    .record-value {
+      font-weight: bold;
+    }
+
+    .btn-start {
+      width: 100%;
+      background: linear-gradient(to right, #22c55e, #16a34a);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 20px;
+      cursor: pointer;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-start:hover {
+      background: linear-gradient(to right, #16a34a, #15803d);
+    }
+
+    .btn-pause {
+      width: 100%;
+      background: #eab308;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-pause:hover {
+      background: #ca8a04;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .btn-control {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .btn-control:active {
+      background: #1e40af;
+    }
+
+    .btn-control.rotate {
+      background: #9333ea;
+    }
+
+    .btn-control.rotate:active {
+      background: #6b21a8;
+    }
+
+    .btn-control.drop {
+      background: #ef4444;
+    }
+
+    .btn-control.drop:active {
+      background: #b91c1c;
+    }
+
+    .instructions {
+      background: rgba(31, 41, 55, 0.8);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      font-size: 12px;
+      color: #e9d5ff;
+    }
+
+    .instructions p {
+      margin-bottom: 4px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #1f2937;
+      border-radius: 8px;
+      padding: 32px;
+      text-align: center;
+      max-width: 384px;
+      margin: 16px;
+      border: 2px solid #ef4444;
+    }
+
+    .modal-title {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      color: #f87171;
+    }
+
+    .modal-info {
+      color: white;
+      margin-bottom: 8px;
+    }
+
+    .modal-score {
+      font-size: 24px;
+    }
+
+    .modal-lines {
+      font-size: 20px;
+      color: #a78bfa;
+    }
+
+    .modal-best {
+      color: #9ca3af;
+      margin-bottom: 24px;
+    }
+
+    .btn-modal {
+      background: linear-gradient(to right, #9333ea, #7e22ce);
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">TETRIS</h1>
+    </div>
+
+    <div class="game-container">
+      <div class="stats-bar">
+        <div class="stats">
+          <div class="stat-box score">
+            <div class="stat-label">Punteggio</div>
+            <div class="stat-value" id="score">0</div>
+          </div>
+          <div class="stat-box lines">
+            <div class="stat-label">Linee</div>
+            <div class="stat-value" id="lines">0</div>
+          </div>
+          <div class="stat-box level">
+            <div class="stat-label">Livello</div>
+            <div class="stat-value" id="level">1</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-area">
+        <div class="board-container">
+          <div class="board" id="board"></div>
+        </div>
+
+        <div class="sidebar">
+          <div class="next-container">
+            <div class="next-label">Prossimo</div>
+            <div class="next-grid" id="next"></div>
+          </div>
+          <div class="record-box">
+            <div class="record-label">Record</div>
+            <div class="record-value" id="best">0</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-start" id="btn-start" onclick="startGame()">▶ INIZIA</button>
+      <button class="btn-pause hidden" id="btn-pause" onclick="togglePause()">⏸ PAUSA</button>
+
+      <div class="controls hidden" id="controls">
+        <button class="btn-control" onclick="moveLeft()">◀</button>
+        <button class="btn-control rotate" onclick="rotate()">↻</button>
+        <button class="btn-control drop" onclick="drop()">▼</button>
+        <button class="btn-control" onclick="moveRight()">▶</button>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <p>⬅️ ➡️ Muovi | 🔄 Ruota | ⬇️ Drop</p>
+      <p>💯 Punti: 1 linea=100 | 2=300 | 3=500 | 4=800</p>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="modal">
+    <div class="modal-content">
+      <h2 class="modal-title">Game Over!</h2>
+      <p class="modal-info modal-score">Punteggio: <span id="modal-score">0</span></p>
+      <p class="modal-info modal-lines">Linee: <span id="modal-lines">0</span></p>
+      <p class="modal-best">Record: <span id="modal-best">0</span></p>
+      <button class="btn-modal" onclick="startGame()">↻ Rigioca</button>
+    </div>
+  </div>
+
+  <script>
+    const ROWS = 20;
+    const COLS = 10;
+
+    const state = {
+      board: [],
+      currentPiece: null,
+      position: { x: 0, y: 0 },
+      score: 0,
+      level: 1,
+      lines: 0,
+      gameOver: false,
+      isPaused: false,
+      isPlaying: false,
+      nextPiece: null,
+      bestScore: 0,
+      gameInterval: null
+    };
+
+    const pieces = {
+      I: { shape: [[1,1,1,1]], color: 'cyan' },
+      O: { shape: [[1,1],[1,1]], color: 'yellow' },
+      T: { shape: [[0,1,0],[1,1,1]], color: 'purple' },
+      S: { shape: [[0,1,1],[1,1,0]], color: 'green' },
+      Z: { shape: [[1,1,0],[0,1,1]], color: 'red' },
+      J: { shape: [[1,0,0],[1,1,1]], color: 'blue' },
+      L: { shape: [[0,0,1],[1,1,1]], color: 'orange' }
+    };
+
+    function init() {
+      const saved = localStorage.getItem('tetris-best');
+      if (saved) state.bestScore = parseInt(saved);
+      document.getElementById('best').textContent = state.bestScore;
+
+      state.board = initBoard();
+      renderBoard();
+    }
+
+    function initBoard() {
+      return Array(ROWS).fill(null).map(() => Array(COLS).fill(null));
+    }
+
+    function getRandomPiece() {
+      const keys = Object.keys(pieces);
+      const key = keys[Math.floor(Math.random() * keys.length)];
+      return { type: key, ...pieces[key] };
+    }
+
+    function startGame() {
+      state.board = initBoard();
+      const piece = getRandomPiece();
+      const next = getRandomPiece();
+      state.currentPiece = piece;
+      state.nextPiece = next;
+      state.position = { x: Math.floor(COLS / 2) - 1, y: 0 };
+      state.score = 0;
+      state.level = 1;
+      state.lines = 0;
+      state.gameOver = false;
+      state.isPaused = false;
+      state.isPlaying = true;
+
+      document.getElementById('score').textContent = 0;
+      document.getElementById('lines').textContent = 0;
+      document.getElementById('level').textContent = 1;
+      document.getElementById('btn-start').classList.add('hidden');
+      document.getElementById('btn-pause').classList.remove('hidden');
+      document.getElementById('controls').classList.remove('hidden');
+      document.getElementById('modal').classList.add('hidden');
+
+      renderBoard();
+      renderNext();
+      startGameLoop();
+    }
+
+    function startGameLoop() {
+      if (state.gameInterval) clearInterval(state.gameInterval);
+
+      const speed = Math.max(100, 1000 - (state.level - 1) * 100);
+      state.gameInterval = setInterval(() => {
+        if (!state.isPaused && !state.gameOver) {
+          moveDown();
+        }
+      }, speed);
+    }
+
+    function togglePause() {
+      state.isPaused = !state.isPaused;
+      document.getElementById('btn-pause').textContent = state.isPaused ? '▶ RIPRENDI' : '⏸ PAUSA';
+    }
+
+    function canMove(piece, x, y, pieceShape = piece.shape) {
+      for (let row = 0; row < pieceShape.length; row++) {
+        for (let col = 0; col < pieceShape[row].length; col++) {
+          if (pieceShape[row][col]) {
+            const newX = x + col;
+            const newY = y + row;
+
+            if (newX < 0 || newX >= COLS || newY >= ROWS) return false;
+            if (newY >= 0 && state.board[newY] && state.board[newY][newX]) return false;
+          }
+        }
+      }
+      return true;
+    }
+
+    function mergePiece() {
+      const newBoard = state.board.map(row => [...row]);
+
+      state.currentPiece.shape.forEach((row, i) => {
+        row.forEach((cell, j) => {
+          if (cell) {
+            const y = state.position.y + i;
+            const x = state.position.x + j;
+            if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
+              newBoard[y][x] = state.currentPiece.color;
+            }
+          }
+        });
+      });
+
+      state.board = newBoard;
+      checkLines();
+      spawnNewPiece();
+    }
+
+    function checkLines() {
+      let linesCleared = 0;
+      const newBoard = state.board.filter(row => {
+        const isFull = row.every(cell => cell !== null);
+        if (isFull) linesCleared++;
+        return !isFull;
+      });
+
+      while (newBoard.length < ROWS) {
+        newBoard.unshift(Array(COLS).fill(null));
+      }
+
+      if (linesCleared > 0) {
+        state.board = newBoard;
+        const points = [0, 100, 300, 500, 800][linesCleared] * state.level;
+        state.score += points;
+        state.lines += linesCleared;
+        state.level = Math.floor(state.lines / 10) + 1;
+
+        if (state.score > state.bestScore) {
+          state.bestScore = state.score;
+          localStorage.setItem('tetris-best', state.score.toString());
+          document.getElementById('best').textContent = state.bestScore;
+        }
+
+        document.getElementById('score').textContent = state.score;
+        document.getElementById('lines').textContent = state.lines;
+        document.getElementById('level').textContent = state.level;
+
+        startGameLoop();
+      }
+    }
+
+    function spawnNewPiece() {
+      const piece = state.nextPiece;
+      const next = getRandomPiece();
+      const startX = Math.floor(COLS / 2) - 1;
+      const startY = 0;
+
+      if (!canMove(piece, startX, startY)) {
+        endGame();
+        return;
+      }
+
+      state.currentPiece = piece;
+      state.nextPiece = next;
+      state.position = { x: startX, y: startY };
+      renderNext();
+    }
+
+    function endGame() {
+      state.gameOver = true;
+      state.isPlaying = false;
+      if (state.gameInterval) clearInterval(state.gameInterval);
+
+      document.getElementById('modal-score').textContent = state.score;
+      document.getElementById('modal-lines').textContent = state.lines;
+      document.getElementById('modal-best').textContent = state.bestScore;
+      document.getElementById('modal').classList.remove('hidden');
+      document.getElementById('btn-start').classList.remove('hidden');
+      document.getElementById('btn-pause').classList.add('hidden');
+      document.getElementById('controls').classList.add('hidden');
+    }
+
+    function moveDown() {
+      if (!state.currentPiece || state.gameOver || state.isPaused) return;
+
+      if (canMove(state.currentPiece, state.position.x, state.position.y + 1)) {
+        state.position.y++;
+      } else {
+        mergePiece();
+      }
+      renderBoard();
+    }
+
+    function moveLeft() {
+      if (!state.currentPiece || state.gameOver || state.isPaused) return;
+      if (canMove(state.currentPiece, state.position.x - 1, state.position.y)) {
+        state.position.x--;
+        renderBoard();
+      }
+    }
+
+    function moveRight() {
+      if (!state.currentPiece || state.gameOver || state.isPaused) return;
+      if (canMove(state.currentPiece, state.position.x + 1, state.position.y)) {
+        state.position.x++;
+        renderBoard();
+      }
+    }
+
+    function rotate() {
+      if (!state.currentPiece || state.gameOver || state.isPaused) return;
+
+      const rotated = state.currentPiece.shape[0].map((_, i) =>
+        state.currentPiece.shape.map(row => row[i]).reverse()
+      );
+
+      if (canMove(state.currentPiece, state.position.x, state.position.y, rotated)) {
+        state.currentPiece.shape = rotated;
+        renderBoard();
+      }
+    }
+
+    function drop() {
+      if (!state.currentPiece || state.gameOver || state.isPaused) return;
+
+      let newY = state.position.y;
+      while (canMove(state.currentPiece, state.position.x, newY + 1)) {
+        newY++;
+      }
+      state.position.y = newY;
+      renderBoard();
+      setTimeout(() => mergePiece(), 50);
+    }
+
+    function renderBoard() {
+      const display = state.board.map(row => [...row]);
+
+      if (state.currentPiece) {
+        state.currentPiece.shape.forEach((row, i) => {
+          row.forEach((cell, j) => {
+            if (cell) {
+              const y = state.position.y + i;
+              const x = state.position.x + j;
+              if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
+                display[y][x] = state.currentPiece.color;
+              }
+            }
+          });
+        });
+      }
+
+      const board = document.getElementById('board');
+      board.innerHTML = display.map(row =>
+        row.map(cell =>
+          `<div class="cell cell-${cell || 'empty'}"></div>`
+        ).join('')
+      ).join('');
+    }
+
+    function renderNext() {
+      if (!state.nextPiece) return;
+
+      const grid = Array(4).fill(null).map(() => Array(4).fill(null));
+      state.nextPiece.shape.forEach((row, i) => {
+        row.forEach((cell, j) => {
+          if (cell) {
+            grid[i][j] = state.nextPiece.color;
+          }
+        });
+      });
+
+      const next = document.getElementById('next');
+      next.innerHTML = grid.map(row =>
+        row.map(cell =>
+          `<div class="next-cell cell-${cell || 'empty'}"></div>`
+        ).join('')
+      ).join('');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (!state.isPlaying || state.gameOver) return;
+
+      if (e.key === 'ArrowLeft') moveLeft();
+      if (e.key === 'ArrowRight') moveRight();
+      if (e.key === 'ArrowDown') moveDown();
+      if (e.key === 'ArrowUp') rotate();
+      if (e.key === ' ') { e.preventDefault(); drop(); }
+      if (e.key === 'p' || e.key === 'P') togglePause();
+    });
+
+    init();
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
