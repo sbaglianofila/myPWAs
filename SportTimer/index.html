@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FORGE — Workout Timer</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FORGE">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0A0A;
+    --surface: #131313;
+    --border: #222;
+    --text: #F0EDE8;
+    --muted: #555;
+    --accent: #FF4D4D;
+    --work-color: #FF4D4D;
+    --rest-color: #4D9FFF;
+    --warmup-color: #FFB830;
+    --cooldown-color: #48CFAD;
+    --radius: 12px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+  }
+
+  header {
+    flex-shrink: 0;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    letter-spacing: 0.12em;
+  }
+  .logo span { color: var(--accent); }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-sub {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* install banner */
+  #installBanner {
+    display: none;
+    background: #181818;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    font-size: 0.8rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--muted);
+  }
+  #installBanner.visible { display: flex; }
+  #installBanner strong { color: var(--text); }
+  .btn-install {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-dismiss {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0 4px;
+  }
+
+  main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+  }
+
+  /* ── SIDEBAR ── */
+  sidebar {
+    border-right: 1px solid var(--border);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sidebar-title {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0 4px 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .btn-import {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-import:hover { border-color: var(--accent); color: var(--accent); }
+
+  .workout-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .workout-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--card-color, var(--accent));
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .workout-card:active { transform: translateX(2px); }
+  .workout-card.active { border-color: var(--card-color, var(--accent)); background: #181818; }
+  .workout-card.active::before { opacity: 1; width: 4px; }
+
+  .card-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 3px;
+  }
+  .card-desc { font-size: 0.72rem; color: var(--muted); margin-bottom: 8px; }
+  .card-meta { display: flex; gap: 8px; font-size: 0.68rem; color: #888; flex-wrap: wrap; }
+  .card-tags { display: flex; gap: 6px; margin-top: 7px; }
+  .tag {
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .tag-warmup   { background: rgba(255,184,48,0.12); color: var(--warmup-color);  border: 1px solid rgba(255,184,48,0.25); }
+  .tag-cooldown { background: rgba(72,207,173,0.12); color: var(--cooldown-color); border: 1px solid rgba(72,207,173,0.25); }
+
+  /* ── TIMER AREA ── */
+  .timer-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 20px;
+    position: relative;
+    overflow-y: auto;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .no-selection { text-align: center; }
+  .no-selection h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+    color: #2a2a2a;
+  }
+  .no-selection p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+  /* progress track */
+  .progress-track {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-bottom: 24px;
+    width: 100%;
+    max-width: 420px;
+    justify-content: center;
+  }
+  .track-seg {
+    height: 4px; border-radius: 2px; flex: 1;
+    background: var(--border); transition: background 0.4s;
+  }
+  .track-seg.warmup-seg   { background: rgba(255,184,48,0.25); max-width: 48px; }
+  .track-seg.cooldown-seg { background: rgba(72,207,173,0.25); max-width: 48px; }
+  .track-seg.done   { background: color-mix(in srgb, var(--phase-color) 45%, transparent); }
+  .track-seg.active { background: var(--phase-color); box-shadow: 0 0 6px var(--phase-color); }
+  .track-label { font-size: 0.55rem; color: var(--muted); white-space: nowrap; }
+
+  /* segment header */
+  .segment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .segment-icon {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    background: color-mix(in srgb, var(--phase-color) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--phase-color) 30%, transparent);
+    transition: all 0.4s;
+  }
+  .workout-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* phase badge */
+  .phase-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.05rem;
+    letter-spacing: 0.3em;
+    padding: 5px 20px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+    transition: all 0.4s;
+    background: color-mix(in srgb, var(--phase-color, var(--accent)) 15%, transparent);
+    color: var(--phase-color, var(--accent));
+    border: 1px solid color-mix(in srgb, var(--phase-color, var(--accent)) 30%, transparent);
+  }
+
+  /* ring */
+  .timer-ring-wrap {
+    position: relative;
+    width: 260px; height: 260px;
+    margin-bottom: 28px;
+  }
+  .timer-svg {
+    position: absolute; top: 0; left: 0;
+    transform: rotate(-90deg);
+    width: 260px; height: 260px;
+  }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 6; }
+  .ring-progress {
+    fill: none;
+    stroke: var(--phase-color, var(--accent));
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 754;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.5s linear, stroke 0.4s ease;
+    filter: drop-shadow(0 0 8px var(--phase-color, var(--accent)));
+  }
+  .timer-inner {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .time-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .time-display.pulse { animation: pulse 0.5s ease; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.07); }
+  }
+  .round-info {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 5px;
+  }
+
+  /* dots */
+  .rounds-dots {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    justify-content: center; max-width: 300px;
+    margin-bottom: 28px;
+  }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
+  .dot.done   { background: var(--phase-color); opacity: 0.4; }
+  .dot.active { background: var(--phase-color); box-shadow: 0 0 6px var(--phase-color); }
+
+  /* controls */
+  .controls { display: flex; gap: 12px; align-items: center; }
+  .btn { font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; border: none; border-radius: 8px; transition: all 0.18s; -webkit-tap-highlight-color: transparent; }
+  .btn-play {
+    background: var(--accent); color: #fff;
+    padding: 14px 36px; font-size: 0.9rem;
+    letter-spacing: 0.04em;
+  }
+  .btn-play:active { filter: brightness(1.2); transform: scale(0.97); }
+  .btn-secondary {
+    background: var(--surface); color: var(--muted);
+    border: 1px solid var(--border); padding: 12px 18px; font-size: 0.78rem;
+  }
+  .btn-secondary:active { border-color: #444; color: var(--text); }
+
+  /* finished */
+  .finished-banner {
+    position: absolute; inset: 0;
+    background: rgba(10,10,10,0.96);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 10; opacity: 0; pointer-events: none;
+    transition: opacity 0.5s;
+    padding: 32px;
+    text-align: center;
+  }
+  .finished-banner.show { opacity: 1; pointer-events: all; }
+  .finished-banner h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem; letter-spacing: 0.1em;
+    color: var(--accent); margin-bottom: 8px;
+  }
+  .finished-banner p { color: var(--muted); margin-bottom: 28px; font-size: 0.85rem; line-height: 1.6; }
+
+  .phase-transition { animation: flashIn 0.32s ease; }
+  @keyframes flashIn {
+    0% { opacity: 0; transform: scale(0.93); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  #fileInput { display: none; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 640px) {
+    body { overflow: auto; }
+
+    main {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      height: auto;
+      min-height: 0;
+    }
+
+    sidebar {
+      height: auto;
+      max-height: 230px;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 12px;
+      gap: 10px;
+    }
+    .sidebar-title { display: none; }
+    .workout-card { min-width: 195px; }
+
+    .timer-area {
+      height: auto;
+      min-height: calc(100svh - 230px - 57px);
+      overflow-y: visible;
+      justify-content: flex-start;
+      padding-top: 20px;
+    }
+
+    .timer-ring-wrap { width: 220px; height: 220px; }
+    .timer-svg { width: 220px; height: 220px; }
+    .ring-progress { stroke-dasharray: 628; }
+    .time-display { font-size: 4.2rem; }
+    .btn-play { padding: 13px 30px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">FOR<span>GE</span></div>
+  <div class="header-right">
+    <div class="header-sub">Workout Timer</div>
+  </div>
+</header>
+
+<!-- Install prompt banner (Android/Chrome) -->
+<div id="installBanner">
+  <span>📲 <strong>Installa FORGE</strong> come app sul tuo telefono</span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="btn-install" id="installBtn">Installa</button>
+    <button class="btn-dismiss" id="dismissBtn">✕</button>
+  </div>
+</div>
+
+<main>
+  <sidebar id="sidebar">
+    <div class="sidebar-title">
+      Allenamenti
+      <button class="btn-import" onclick="document.getElementById('fileInput').click()">📂 Importa JSON</button>
+    </div>
+    <div id="workoutList"></div>
+  </sidebar>
+
+  <div class="timer-area" id="timerArea">
+
+    <div class="no-selection" id="noSelection">
+      <h2>SELEZIONA<br>UN WORKOUT</h2>
+      <p>Scegli un allenamento dalla lista<br>o importa un file JSON personalizzato</p>
+    </div>
+
+    <div id="timerUI" style="display:none; flex-direction:column; align-items:center; width:100%">
+      <div class="progress-track" id="progressTrack"></div>
+      <div class="segment-header">
+        <div class="segment-icon" id="segmentIcon">🔥</div>
+        <div class="workout-title" id="workoutTitle">—</div>
+      </div>
+      <div class="phase-badge" id="phaseBadge">—</div>
+      <div class="timer-ring-wrap">
+        <svg class="timer-svg" viewBox="0 0 260 260">
+          <circle class="ring-bg" cx="130" cy="130" r="120"/>
+          <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="120"/>
+        </svg>
+        <div class="timer-inner">
+          <div class="time-display" id="timeDisplay">00</div>
+          <div class="round-info" id="roundInfo"></div>
+        </div>
+      </div>
+      <div class="rounds-dots" id="roundsDots"></div>
+      <div class="controls">
+        <button class="btn btn-secondary" onclick="resetTimer()">↺ Reset</button>
+        <button class="btn btn-play" id="playBtn" onclick="toggleTimer()">▶ START</button>
+        <button class="btn btn-secondary" onclick="skipPhase()">Skip ›</button>
+      </div>
+    </div>
+
+    <div class="finished-banner" id="finishedBanner">
+      <h2>COMPLETO!</h2>
+      <p id="finishedSummary"></p>
+      <button class="btn btn-play" onclick="resetTimer()">↺ Ricomincia</button>
+    </div>
+  </div>
+</main>
+
+<input type="file" id="fileInput" accept=".json" onchange="importJSON(event)">
+
+<script>
+// ─── PWA: Service Worker ──────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
+// ─── PWA: Install prompt (Android/Chrome) ────────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('visible');
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').classList.remove('visible');
+});
+document.getElementById('dismissBtn').addEventListener('click', () => {
+  document.getElementById('installBanner').classList.remove('visible');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('visible');
+});
+
+// ─── CONSTANTS ────────────────────────────────────────────────
+// r=120 → C = 2π×120 ≈ 753.98
+const CIRCUMFERENCE = 2 * Math.PI * 120;
+
+const TYPE_WARMUP   = 'warmup';
+const TYPE_WORK     = 'work';
+const TYPE_REST     = 'rest';
+const TYPE_COOLDOWN = 'cooldown';
+
+const PHASE_COLORS = {
+  [TYPE_WARMUP]:   '#FFB830',
+  [TYPE_WORK]:     null,
+  [TYPE_REST]:     '#4D9FFF',
+  [TYPE_COOLDOWN]: '#48CFAD',
+};
+const PHASE_ICONS = {
+  [TYPE_WARMUP]:   '🌡️',
+  [TYPE_WORK]:     '🔥',
+  [TYPE_REST]:     '💧',
+  [TYPE_COOLDOWN]: '🧊',
+};
+
+// ─── STATE ────────────────────────────────────────────────────
+let workouts = [];
+let selectedWorkout = null;
+let sequence = [];
+let seqIndex = 0;
+let currentRound = 0;
+let timeLeft = 0;
+let phaseDuration = 0;
+let isRunning = false;
+let timerInterval = null;
+
+// ─── SEQUENCE ─────────────────────────────────────────────────
+function buildSequence(w) {
+  const seq = [];
+  if (w.warmup)
+    seq.push({ name: w.warmup.name, duration: w.warmup.duration, type: TYPE_WARMUP, round: 0 });
+  for (let r = 1; r <= w.rounds; r++)
+    w.phases.forEach(p => seq.push({ name: p.name, duration: p.duration, type: p.type, round: r }));
+  if (w.cooldown)
+    seq.push({ name: w.cooldown.name, duration: w.cooldown.duration, type: TYPE_COOLDOWN, round: 0 });
+  return seq;
+}
+
+function phaseColor(phase) {
+  if (phase.type === TYPE_WORK) return selectedWorkout.color || '#FF4D4D';
+  return PHASE_COLORS[phase.type] || '#FF4D4D';
+}
+
+// ─── INIT ─────────────────────────────────────────────────────
+async function init() {
+  try {
+    const res = await fetch('./workouts.json');
+    if (res.ok) { loadWorkouts(await res.json()); return; }
+  } catch(e) {}
+  loadWorkouts(defaultWorkouts());
+}
+
+function defaultWorkouts() {
+  return { workouts: [
+    { id:"hiit", name:"HIIT Base", description:"Alta intensità classico", color:"#FF4D4D", rounds:8,
+      warmup:{name:"Riscaldamento",duration:120}, cooldown:{name:"Defaticamento",duration:120},
+      phases:[{name:"Lavoro",duration:40,type:"work"},{name:"Riposo",duration:20,type:"rest"}] },
+    { id:"tabata", name:"Tabata", description:"Protocollo 20/10", color:"#FF8C00", rounds:8,
+      warmup:{name:"Riscaldamento",duration:180}, cooldown:{name:"Defaticamento",duration:120},
+      phases:[{name:"Lavoro",duration:20,type:"work"},{name:"Riposo",duration:10,type:"rest"}] },
+    { id:"forza", name:"Forza", description:"Serie con recupero completo", color:"#4D9FFF", rounds:5,
+      warmup:{name:"Riscaldamento",duration:300}, cooldown:{name:"Defaticamento",duration:180},
+      phases:[{name:"Serie",duration:60,type:"work"},{name:"Recupero",duration:90,type:"rest"}] },
+    { id:"emom", name:"EMOM 10 min", description:"Every Minute On the Minute", color:"#7C4DFF", rounds:10,
+      warmup:{name:"Riscaldamento",duration:120}, cooldown:{name:"Defaticamento",duration:120},
+      phases:[{name:"Esercizio",duration:40,type:"work"},{name:"Pausa",duration:20,type:"rest"}] },
+  ]};
+}
+
+function loadWorkouts(data) {
+  workouts = data.workouts || [];
+  renderSidebar();
+}
+
+// ─── SIDEBAR ──────────────────────────────────────────────────
+function renderSidebar() {
+  const list = document.getElementById('workoutList');
+  list.innerHTML = '';
+  workouts.forEach(w => {
+    const total = w.rounds * w.phases.reduce((s,p)=>s+p.duration,0)
+                + (w.warmup?.duration||0) + (w.cooldown?.duration||0);
+    const mins = Math.floor(total/60);
+    const card = document.createElement('div');
+    card.className = 'workout-card';
+    card.style.setProperty('--card-color', w.color||'#FF4D4D');
+    card.id = `card-${w.id}`;
+    const tags = [
+      w.warmup   ? `<span class="tag tag-warmup">🌡️ ${w.warmup.duration}s</span>`   : '',
+      w.cooldown ? `<span class="tag tag-cooldown">🧊 ${w.cooldown.duration}s</span>` : '',
+    ].filter(Boolean).join('');
+    card.innerHTML = `
+      <div class="card-name">${w.name}</div>
+      <div class="card-desc">${w.description||''}</div>
+      <div class="card-meta">
+        <span>⟳ ${w.rounds} rounds</span>
+        <span>⏱ ~${mins} min</span>
+        <span>⚡ ${w.phases.length} fasi</span>
+      </div>
+      ${tags ? `<div class="card-tags">${tags}</div>` : ''}`;
+    card.onclick = () => selectWorkout(w);
+    list.appendChild(card);
+  });
+}
+
+// ─── SELECT ───────────────────────────────────────────────────
+function selectWorkout(w) {
+  selectedWorkout = w;
+  stopTimer();
+  document.querySelectorAll('.workout-card').forEach(c => c.classList.remove('active'));
+  document.getElementById(`card-${w.id}`)?.classList.add('active');
+  document.getElementById('noSelection').style.display = 'none';
+  document.getElementById('timerUI').style.display = 'flex';
+  document.documentElement.style.setProperty('--accent', w.color||'#FF4D4D');
+  resetTimer();
+}
+
+// ─── TIMER ────────────────────────────────────────────────────
+function resetTimer() {
+  stopTimer();
+  sequence = buildSequence(selectedWorkout);
+  seqIndex = 0; currentRound = 0;
+  document.getElementById('finishedBanner').classList.remove('show');
+  document.getElementById('playBtn').textContent = '▶ START';
+  renderProgressTrack();
+  renderDots();
+  applyPhase(sequence[0]);
+}
+
+function applyPhase(phase) {
+  phaseDuration = phase.duration;
+  timeLeft = phase.duration;
+  currentRound = phase.round;
+  const color = phaseColor(phase);
+  document.documentElement.style.setProperty('--phase-color', color);
+  document.getElementById('workoutTitle').textContent = selectedWorkout.name.toUpperCase();
+  document.getElementById('phaseBadge').textContent = phase.name.toUpperCase();
+  document.getElementById('phaseBadge').classList.add('phase-transition');
+  setTimeout(()=>document.getElementById('phaseBadge').classList.remove('phase-transition'),320);
+  document.getElementById('segmentIcon').textContent = PHASE_ICONS[phase.type]||'🔥';
+  const ri = document.getElementById('roundInfo');
+  if      (phase.type===TYPE_WARMUP)   ri.textContent='RISCALDAMENTO';
+  else if (phase.type===TYPE_COOLDOWN) ri.textContent='DEFATICAMENTO';
+  else ri.textContent=`Round ${phase.round} / ${selectedWorkout.rounds}`;
+  setTimeDisplay(timeLeft);
+  setRingProgress(1);
+  updateProgressTrack();
+  updateDots();
+}
+
+function toggleTimer() { isRunning ? pauseTimer() : startTimer(); }
+
+function startTimer() {
+  isRunning = true;
+  document.getElementById('playBtn').textContent = '⏸ PAUSA';
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    setTimeDisplay(timeLeft);
+    setRingProgress(timeLeft/phaseDuration);
+    if(timeLeft<=0) advanceSequence();
+  },1000);
+}
+
+function pauseTimer() {
+  isRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('playBtn').textContent = '▶ RIPRENDI';
+}
+
+function stopTimer() {
+  isRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('playBtn').textContent = '▶ START';
+}
+
+function skipPhase() {
+  if(!selectedWorkout) return;
+  stopTimer(); advanceSequence();
+}
+
+function advanceSequence() {
+  clearInterval(timerInterval); isRunning=false;
+  seqIndex++;
+  if(seqIndex>=sequence.length){ showFinished(); return; }
+  applyPhase(sequence[seqIndex]);
+  document.getElementById('playBtn').textContent='▶ RIPRENDI';
+  setTimeout(()=>{ startTimer(); document.getElementById('playBtn').textContent='⏸ PAUSA'; },600);
+}
+
+function showFinished() {
+  const w=selectedWorkout;
+  const mins=Math.floor(w.rounds*w.phases.reduce((s,p)=>s+p.duration,0)/60);
+  document.getElementById('finishedSummary').textContent=
+    `${w.name} — ${w.rounds} rounds, ~${mins} min di lavoro. Ottimo!`;
+  document.getElementById('finishedBanner').classList.add('show');
+}
+
+// ─── DISPLAY ──────────────────────────────────────────────────
+function setTimeDisplay(secs) {
+  const el = document.getElementById('timeDisplay');
+  const m = Math.floor(secs/60), s = secs%60;
+  el.textContent = m>0 ? `${m}:${s<10?'0'+s:s}` : (secs<10?'0'+secs:String(secs));
+  if(secs<=3&&secs>0){el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');}
+}
+
+function setRingProgress(fraction) {
+  document.getElementById('ringProgress').style.strokeDashoffset = CIRCUMFERENCE*(1-fraction);
+}
+
+// ─── PROGRESS TRACK ───────────────────────────────────────────
+function renderProgressTrack() {
+  const c=document.getElementById('progressTrack'); c.innerHTML='';
+  const w=selectedWorkout;
+  if(w.warmup){
+    const l=document.createElement('span'); l.className='track-label'; l.textContent='🌡️'; c.appendChild(l);
+    const s=document.createElement('div'); s.className='track-seg warmup-seg'; s.dataset.seqIndex=0; c.appendChild(s);
+  }
+  const off=w.warmup?1:0, max=Math.min(w.rounds,12);
+  for(let r=0;r<max;r++) w.phases.forEach((p,pi)=>{
+    const s=document.createElement('div'); s.className='track-seg';
+    s.dataset.seqIndex=off+r*w.phases.length+pi; c.appendChild(s);
+  });
+  if(w.rounds>max){const l=document.createElement('span');l.className='track-label';l.style.color='#444';l.textContent='…';c.appendChild(l);}
+  if(w.cooldown){
+    const s=document.createElement('div'); s.className='track-seg cooldown-seg'; s.dataset.seqIndex=sequence.length-1; c.appendChild(s);
+    const l=document.createElement('span'); l.className='track-label'; l.textContent='🧊'; c.appendChild(l);
+  }
+  updateProgressTrack();
+}
+
+function updateProgressTrack() {
+  document.querySelectorAll('.track-seg').forEach(seg=>{
+    const idx=parseInt(seg.dataset.seqIndex);
+    seg.classList.remove('done','active');
+    if(idx<seqIndex) seg.classList.add('done');
+    else if(idx===seqIndex) seg.classList.add('active');
+  });
+}
+
+// ─── DOTS ─────────────────────────────────────────────────────
+function renderDots() {
+  const c=document.getElementById('roundsDots'); c.innerHTML='';
+  const total=Math.min(selectedWorkout.rounds,20);
+  for(let i=1;i<=total;i++){const d=document.createElement('div');d.className='dot';d.id=`dot-${i}`;c.appendChild(d);}
+  updateDots();
+}
+function updateDots() {
+  const total=Math.min(selectedWorkout.rounds,20);
+  for(let i=1;i<=total;i++){
+    const d=document.getElementById(`dot-${i}`); if(!d) continue;
+    d.className='dot';
+    if(i<currentRound) d.classList.add('done');
+    else if(i===currentRound) d.classList.add('active');
+  }
+}
+
+// ─── IMPORT ───────────────────────────────────────────────────
+function importJSON(event) {
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try {
+      const data=JSON.parse(e.target.result);
+      if(!data.workouts||!Array.isArray(data.workouts)) throw new Error('Formato non valido');
+      loadWorkouts(data);
+      alert(`✅ Importati ${data.workouts.length} allenamenti da ${file.name}`);
+    } catch(err){ alert('❌ Errore: '+err.message); }
+  };
+  reader.readAsText(file);
+  event.target.value='';
+}
+
+// ─── KEYBOARD ─────────────────────────────────────────────────
+document.addEventListener('keydown', e=>{
+  if(!selectedWorkout) return;
+  if(e.code==='Space'){e.preventDefault();toggleTimer();}
+  if(e.code==='KeyR') resetTimer();
+  if(e.code==='ArrowRight') skipPhase();
+});
+
+// ─── GO ───────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+{
+  "workouts": [
+    {
+      "id": "hiit_base",
+      "name": "HIIT Base",
+      "description": "Allenamento ad alta intensità classico",
+      "color": "#FF4D4D",
+      "rounds": 8,
+      "warmup": { "name": "Riscaldamento", "duration": 120 },
+      "cooldown": { "name": "Defaticamento", "duration": 120 },
+      "phases": [
+        { "name": "Lavoro", "duration": 40, "type": "work" },
+        { "name": "Riposo", "duration": 20, "type": "rest" }
+      ]
+    },
+    {
+      "id": "it_01",
+      "name": "Interval Training 01",
+      "description": "Interval Training",
+      "color": "#FF4D4D",
+      "rounds": 1,
+      "warmup": { "name": "Riscaldamento", "duration": 120 },
+      "cooldown": { "name": "Defaticamento", "duration": 120 },
+      "phases": [
+        { "name": "+ 1.0 KH", "duration": 60, "type": "work" },
+        { "name": "- 2.0 KH", "duration": 120, "type": "rest" },
+        { "name": "+ 1.5 KH", "duration": 60, "type": "work" },
+        { "name": "- 1.0 KH", "duration": 120, "type": "rest" }
+      ]
+    },
+    {
+      "id": "tabata",
+      "name": "Tabata",
+      "description": "Protocollo Tabata originale 20/10",
+      "color": "#FF8C00",
+      "rounds": 8,
+      "warmup": { "name": "Riscaldamento", "duration": 180 },
+      "cooldown": { "name": "Defaticamento", "duration": 120 },
+      "phases": [
+        { "name": "Lavoro", "duration": 20, "type": "work" },
+        { "name": "Riposo", "duration": 10, "type": "rest" }
+      ]
+    },
+    {
+      "id": "forza",
+      "name": "Allenamento Forza",
+      "description": "Serie lunghe con recupero completo",
+      "color": "#4D9FFF",
+      "rounds": 5,
+      "warmup": { "name": "Riscaldamento", "duration": 300 },
+      "cooldown": { "name": "Defaticamento", "duration": 180 },
+      "phases": [
+        { "name": "Serie", "duration": 60, "type": "work" },
+        { "name": "Recupero", "duration": 90, "type": "rest" }
+      ]
+    },
+    {
+      "id": "emom",
+      "name": "EMOM 10 min",
+      "description": "Every Minute On the Minute",
+      "color": "#7C4DFF",
+      "rounds": 10,
+      "warmup": { "name": "Riscaldamento", "duration": 120 },
+      "cooldown": { "name": "Defaticamento", "duration": 120 },
+      "phases": [
+        { "name": "Esercizio", "duration": 40, "type": "work" },
+        { "name": "Pausa", "duration": 20, "type": "rest" }
+      ]
+    },
+    {
+      "id": "amrap",
+      "name": "AMRAP 20 min",
+      "description": "As Many Rounds As Possible",
+      "color": "#00C9A7",
+      "rounds": 1,
+      "warmup": { "name": "Riscaldamento", "duration": 180 },
+      "cooldown": { "name": "Defaticamento", "duration": 180 },
+      "phases": [
+        { "name": "Lavoro continuo", "duration": 1200, "type": "work" }
+      ]
+    }
+  ]
+}
