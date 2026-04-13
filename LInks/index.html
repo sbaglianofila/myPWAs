@@ -1,0 +1,2564 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Miei Link</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f11;
+    --surface: #18181c;
+    --surface2: #22222a;
+    --border: #2e2e3a;
+    --accent: #c8a96e;
+    --accent2: #7c9eb5;
+    --text: #e8e6e1;
+    --muted: #7a7885;
+    --tag-news: #c8a96e22;
+    --tag-news-text: #c8a96e;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── HEADER ─────────────────────────────── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+
+  .logo span { color: var(--muted); font-size: 0.85rem; font-family: 'DM Sans', sans-serif; display: block; font-weight: 300; margin-top: -2px; }
+
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: 0.04em;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── SEARCH ──────────────────────────────── */
+  .search-bar {
+    padding: 20px 32px 0;
+    max-width: 520px;
+  }
+  .search-bar input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px 10px 40px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color .2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237a7885' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.44 1.398a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 14px center;
+  }
+  .search-bar input:focus { border-color: var(--accent2); }
+  .search-bar input::placeholder { color: var(--muted); }
+
+  /* ── MAIN GRID ───────────────────────────── */
+  main {
+    padding: 24px 32px 60px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+
+  /* ── SECTION CARD ────────────────────────── */
+  .section-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+  .section-card:hover { border-color: #3e3e4e; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s, background .2s;
+  }
+  .section-card.open .section-header { border-bottom-color: var(--border); }
+  .section-header:hover { background: var(--surface2); }
+
+  .section-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .section-meta { flex: 1; }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .section-count {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .chevron {
+    color: var(--muted);
+    font-size: 0.75rem;
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+    flex-shrink: 0;
+  }
+  .section-card.open .chevron { transform: rotate(180deg); }
+
+  /* ── LINKS LIST ──────────────────────────── */
+  .links-body {
+    display: none;
+    padding: 8px 0;
+  }
+  .section-card.open .links-body { display: block; }
+
+  .link-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 18px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.84rem;
+    border-radius: 0;
+    transition: background .15s;
+    position: relative;
+  }
+  .link-item:hover { background: var(--surface2); }
+  .link-item:hover .link-arrow { opacity: 1; transform: translateX(0); }
+
+  .favicon {
+    width: 16px; height: 16px;
+    border-radius: 3px;
+    object-fit: contain;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+  .favicon-fallback {
+    width: 16px; height: 16px;
+    border-radius: 3px;
+    background: var(--border);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem;
+    color: var(--muted);
+  }
+
+  .link-text { flex: 1; }
+  .link-name { font-weight: 500; color: var(--text); }
+  .link-desc { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+
+  .link-badge {
+    font-size: 0.65rem;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+
+  .link-arrow {
+    color: var(--muted);
+    font-size: 0.7rem;
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all .2s;
+  }
+
+  /* ── CATEGORY COLOR THEMES ───────────────── */
+  .cat-nazionale .section-icon { background: #c8a96e22; color: var(--accent); }
+  .cat-locale .section-icon    { background: #7c9eb522; color: var(--accent2); }
+  .cat-estera .section-icon    { background: #9e7cb522; color: #b08fc8; }
+  .cat-online .section-icon    { background: #7cb59e22; color: #7cc8a9; }
+  .cat-mediatv .section-icon   { background: #b57c7c22; color: #c88787; }
+
+  .badge-nazionale { background: #c8a96e22; color: var(--accent); }
+  .badge-locale    { background: #7c9eb522; color: var(--accent2); }
+  .badge-estera    { background: #9e7cb522; color: #b08fc8; }
+  .badge-online    { background: #7cb59e22; color: #7cc8a9; }
+  .badge-mediatv   { background: #b57c7c22; color: #c88787; }
+
+  /* ── SUBSECTION DIVIDER ──────────────────── */
+  .subsection-label {
+    padding: 10px 18px 4px;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: 600;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+  .subsection-label:first-child { border-top: none; margin-top: 0; }
+
+  /* ── FOOTER ──────────────────────────────── */
+  .page-footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.72rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── HIDDEN (search) ─────────────────────── */
+  .link-item.hidden { display: none; }
+  .section-card.search-hidden { display: none; }
+
+  @media (max-width: 600px) {
+    main { padding: 16px; gap: 12px; }
+    header { padding: 14px 16px; }
+    .search-bar { padding: 14px 16px 0; }
+  }
+</style>
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    🔖 I Miei Link
+    <span>La tua biblioteca personale</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn-ghost" onclick="expandAll()">Espandi tutto</button>
+    <button class="btn-ghost" onclick="collapseAll()">Comprimi tutto</button>
+  </div>
+</header>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" placeholder="Cerca un sito…" oninput="filterLinks(this.value)">
+</div>
+
+<main id="mainGrid">
+
+  <!-- ══════════════════════════════════════════
+       NEWS NAZIONALI
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-nazionale open" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">News Nazionali</div>
+        <div class="section-count">Quotidiani e agenzie italiane</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Quotidiani</div>
+
+      <a class="link-item" href="https://www.corriere.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.corriere.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">C</span>
+        <span class="link-text">
+          <span class="link-name">Corriere della Sera</span>
+          <span class="link-desc"><br/>Il quotidiano più diffuso in Italia</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.repubblica.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.repubblica.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">La Repubblica</span>
+          <span class="link-desc">Notizie, opinioni e approfondimenti</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.lastampa.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lastampa.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">La Stampa</span>
+          <span class="link-desc">Storico quotidiano torinese</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.ilsole24ore.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilsole24ore.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Il Sole 24 Ore</span>
+          <span class="link-desc">Economia, finanza e diritto</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.ilmessaggero.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilmessaggero.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Il Messaggero</span>
+          <span class="link-desc">Quotidiano romano di riferimento</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.corrieredellosport.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.corrieredellosport.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Gazzetta dello Sport</span>
+          <span class="link-desc">Sport e calcio italiano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Agenzie di Stampa</div>
+
+      <a class="link-item" href="https://www.ansa.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ansa.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">ANSA</span>
+          <span class="link-desc">Agenzia Nazionale Stampa Associata</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.adnkronos.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.adnkronos.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">Adnkronos</span>
+          <span class="link-desc">Agenzia di stampa indipendente</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       NEWS LOCALI
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-locale" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">News Locali</div>
+        <div class="section-count">Informazione del territorio</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Aggiungi le tue fonti locali</div>
+
+      <a class="link-item" href="https://www.ilrestodelcarlino.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilrestodelcarlino.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">C</span>
+        <span class="link-text">
+          <span class="link-name">Il Resto del Carlino</span>
+          <span class="link-desc">Emilia-Romagna, Marche, Toscana</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.ilgiorno.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilgiorno.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">G</span>
+        <span class="link-text">
+          <span class="link-name">Il Giorno</span>
+          <span class="link-desc">Lombardia e Milano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.lanazione.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lanazione.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">La Nazione</span>
+          <span class="link-desc">Toscana e centro Italia</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.ilmattino.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilmattino.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Il Mattino</span>
+          <span class="link-desc">Campania e Napoli</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://palermo.repubblica.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://palermo.repubblica.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">Repubblica Palermo</span>
+          <span class="link-desc">Sicilia e Palermo</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       NEWS ESTERE
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-estera" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">News Estere</div>
+        <div class="section-count">Fonti internazionali autorevoli</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Anglofone</div>
+
+      <a class="link-item" href="https://www.bbc.com/news" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.bbc.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">B</span>
+        <span class="link-text">
+          <span class="link-name">BBC News</span>
+          <span class="link-desc">Radiotelevisione pubblica britannica</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.theguardian.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.theguardian.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">G</span>
+        <span class="link-text">
+          <span class="link-name">The Guardian</span>
+          <span class="link-desc">Quotidiano liberal britannico</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.nytimes.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.nytimes.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">New York Times</span>
+          <span class="link-desc">Il quotidiano di riferimento americano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.wsj.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.wsj.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">W</span>
+        <span class="link-text">
+          <span class="link-name">Wall Street Journal</span>
+          <span class="link-desc">Finanza e business internazionale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.ft.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ft.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">Financial Times</span>
+          <span class="link-desc">Economia e mercati globali</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Europee & Altro</div>
+
+      <a class="link-item" href="https://www.lemonde.fr" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lemonde.fr/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Le Monde</span>
+          <span class="link-desc">Quotidiano di riferimento francese</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.dw.com/it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.dw.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">D</span>
+        <span class="link-text">
+          <span class="link-name">Deutsche Welle</span>
+          <span class="link-desc">Radiotelevisione pubblica tedesca (in italiano)</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://apnews.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://apnews.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">Associated Press</span>
+          <span class="link-desc">Agenzia di stampa indipendente USA</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.reuters.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.reuters.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">Reuters</span>
+          <span class="link-desc">Agenzia internazionale di riferimento</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Spagnole 🇪🇸</div>
+
+      <a class="link-item" href="https://www.elpais.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.elpais.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">El País</span>
+          <span class="link-desc">Il quotidiano di riferimento spagnolo e iberoamericano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.elmundo.es" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.elmundo.es/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">El Mundo</span>
+          <span class="link-desc">Secondo quotidiano spagnolo per diffusione</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.elconfidencial.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.elconfidencial.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">C</span>
+        <span class="link-text">
+          <span class="link-name">El Confidencial</span>
+          <span class="link-desc">News digitale indipendente, investigazione e politica</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.lavanguardia.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lavanguardia.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">V</span>
+        <span class="link-text">
+          <span class="link-name">La Vanguardia</span>
+          <span class="link-desc">Storico quotidiano catalano di respiro nazionale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.rtve.es/noticias" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rtve.es/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">RTVE Noticias</span>
+          <span class="link-desc">Radiotelevisione pubblica spagnola</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       NEWS ONLINE / DIGITALE
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-online" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">News Online</div>
+        <div class="section-count">Testate native digitali</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Italiane</div>
+
+      <a class="link-item" href="https://www.fanpage.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.fanpage.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">Fanpage.it</span>
+          <span class="link-desc">News online multi-verticale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.open.online" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.open.online/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">O</span>
+        <span class="link-text">
+          <span class="link-name">Open</span>
+          <span class="link-desc">Giornalismo digitale e fact-checking</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.ilpost.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilpost.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">Il Post</span>
+          <span class="link-desc">Giornalismo di qualità, nativo digitale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.wired.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.wired.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">W</span>
+        <span class="link-text">
+          <span class="link-name">Wired Italia</span>
+          <span class="link-desc">Tech, scienza e cultura digitale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionali</div>
+
+      <a class="link-item" href="https://www.politico.eu" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.politico.eu/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">Politico Europe</span>
+          <span class="link-desc">Politica europea e UE</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.axios.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.axios.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">Axios</span>
+          <span class="link-desc">Smart brevity journalism americano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.theatlantic.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.theatlantic.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">The Atlantic</span>
+          <span class="link-desc">Approfondimento e long-form journalism</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MEDIA TV & RADIO
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-mediatv" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Media TV & Radio</div>
+        <div class="section-count">Televisioni e radio pubbliche e private</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Televisioni Italiane</div>
+
+      <a class="link-item" href="https://www.rainews.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rainews.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">RaiNews 24</span>
+          <span class="link-desc">Canale all-news della RAI</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://tg24.sky.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://tg24.sky.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Sky TG24</span>
+          <span class="link-desc">Canale all-news di Sky Italia</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.la7.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.la7.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">7</span>
+        <span class="link-text">
+          <span class="link-name">La7</span>
+          <span class="link-desc">Approfondimento e politica</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Radio</div>
+
+      <a class="link-item" href="https://www.rairadio1.rai.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rai.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">RAI Radio 1</span>
+          <span class="link-desc">Prima rete radiofonica pubblica</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.radio24.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.radio24.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">Radio 24</span>
+          <span class="link-desc">Radio del Sole 24 Ore, news ed economia</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionali</div>
+
+      <a class="link-item" href="https://www.aljazeera.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.aljazeera.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">Al Jazeera English</span>
+          <span class="link-desc">Punto di vista dal mondo arabo e globale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.euronews.com/it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.euronews.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">E</span>
+        <span class="link-text">
+          <span class="link-name">Euronews Italia</span>
+          <span class="link-desc">TV pan-europea, in italiano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       SPORT
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-online" data-section style="--icon-bg:#2a6e4422;--icon-color:#5ec98a">
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Sport</div>
+        <div class="section-count">Calcio, motori e sport internazionali</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Italia</div>
+
+      <a class="link-item" href="https://www.gazzetta.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.gazzetta.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">G</span>
+        <span class="link-text">
+          <span class="link-name">Gazzetta dello Sport</span>
+          <span class="link-desc">Il quotidiano sportivo più letto d'Italia</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.corrieredellosport.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.corrieredellosport.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">C</span>
+        <span class="link-text">
+          <span class="link-name">Corriere dello Sport</span>
+          <span class="link-desc">Calcio e sport italiano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.tuttosport.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.tuttosport.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">T</span>
+        <span class="link-text">
+          <span class="link-name">Tuttosport</span>
+          <span class="link-desc">Focus su Juventus, Torino e sport nordovest</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.moto.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.moto.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Moto.it</span>
+          <span class="link-desc">MotoGP, Superbike e motori due ruote</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionali</div>
+
+      <a class="link-item" href="https://www.espn.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.espn.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">E</span>
+        <span class="link-text">
+          <span class="link-name">ESPN</span>
+          <span class="link-desc">Sport USA e internazionali</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.bbc.com/sport" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.bbc.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">B</span>
+        <span class="link-text">
+          <span class="link-name">BBC Sport</span>
+          <span class="link-desc">Premier League, Wimbledon e oltre</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.formula1.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.formula1.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">Formula 1 Official</span>
+          <span class="link-desc">Sito ufficiale F1: risultati, classifiche, news</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.theathletic.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.theathletic.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">The Athletic</span>
+          <span class="link-desc">Giornalismo sportivo approfondito (NYT)</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       FINANZA
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-estera" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Finanza & Economia</div>
+        <div class="section-count">Mercati, borse e macroeconomia</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Italiane</div>
+
+      <a class="link-item" href="https://www.ilsole24ore.com/finanza" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilsole24ore.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Il Sole 24 Ore — Finanza</span>
+          <span class="link-desc">Mercati, borse e dati finanziari</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.milanofinanza.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.milanofinanza.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Milano Finanza</span>
+          <span class="link-desc">Borsa, fondi, risparmio gestito</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.borsaitaliana.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.borsaitaliana.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">B</span>
+        <span class="link-text">
+          <span class="link-name">Borsa Italiana</span>
+          <span class="link-desc">Quotazioni, indici e dati ufficiali</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionali</div>
+
+      <a class="link-item" href="https://www.ft.com/markets" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ft.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">Financial Times — Markets</span>
+          <span class="link-desc">Mercati globali e analisi macro</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.bloomberg.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.bloomberg.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">B</span>
+        <span class="link-text">
+          <span class="link-name">Bloomberg</span>
+          <span class="link-desc">Il riferimento globale per finanza e business</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.wsj.com/markets" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.wsj.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">W</span>
+        <span class="link-text">
+          <span class="link-name">Wall Street Journal — Markets</span>
+          <span class="link-desc">Wall Street, economia USA e globale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.economist.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.economist.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">E</span>
+        <span class="link-text">
+          <span class="link-name">The Economist</span>
+          <span class="link-desc">Analisi economica e politica globale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://finance.yahoo.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://finance.yahoo.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">Y</span>
+        <span class="link-text">
+          <span class="link-name">Yahoo Finance</span>
+          <span class="link-desc">Quotazioni, portfolio e dati in tempo reale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MAGAZINE ITALIANI + INTERNAZIONALI (split)
+  ═══════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════
+       MAGAZINE ITALIANI
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-nazionale" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Magazine Italiani</div>
+        <div class="section-count">Settimanali, cultura e divulgazione</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Politica & Attualità</div>
+
+      <a class="link-item" href="https://www.internazionale.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.internazionale.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">I</span>
+        <span class="link-text">
+          <span class="link-name">Internazionale</span>
+          <span class="link-desc">Il meglio della stampa estera tradotto in italiano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.lespresso.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lespresso.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">E</span>
+        <span class="link-text">
+          <span class="link-name">L'Espresso</span>
+          <span class="link-desc">Settimanale storico di politica e cultura</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.panorama.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.panorama.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">Panorama</span>
+          <span class="link-desc">Attualità, economia e società</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.oggi.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.oggi.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">O</span>
+        <span class="link-text">
+          <span class="link-name">Oggi</span>
+          <span class="link-desc">Settimanale di attualità e società dal 1945</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.corriere.it/sette" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.corriere.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">7</span>
+        <span class="link-text">
+          <span class="link-name">7 — Corriere della Sera</span>
+          <span class="link-desc">Supplemento settimanale del Corriere</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.repubblica.it/robinson" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.repubblica.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">Robinson — La Repubblica</span>
+          <span class="link-desc">Libri, cultura e idee del sabato</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Scienza & Natura</div>
+
+      <a class="link-item" href="https://www.focus.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.focus.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">Focus</span>
+          <span class="link-desc">Scienza, natura e tecnologia divulgativa</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.lescienze.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lescienze.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Le Scienze</span>
+          <span class="link-desc">Edizione italiana di Scientific American</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.nationalgeographic.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.nationalgeographic.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">National Geographic Italia</span>
+          <span class="link-desc">Natura, scienza ed esplorazione in italiano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.galileonet.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.galileonet.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">G</span>
+        <span class="link-text">
+          <span class="link-name">Galileo</span>
+          <span class="link-desc">Giornale di scienza e problemi globali</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Business & Management</div>
+
+      <a class="link-item" href="https://www.harvardbusinessreview.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.harvardbusinessreview.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">H</span>
+        <span class="link-text">
+          <span class="link-name">Harvard Business Review Italia</span>
+          <span class="link-desc">Management, leadership e strategia in italiano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.economia.corriere.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.corriere.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">E</span>
+        <span class="link-text">
+          <span class="link-name">Corriere Economia</span>
+          <span class="link-desc">Supplemento economico del Corriere della Sera</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MAGAZINE INTERNAZIONALI
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-estera" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Magazine Internazionali</div>
+        <div class="section-count">Long-form, cultura e geopolitica</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Cultura & Società</div>
+
+      <a class="link-item" href="https://www.newyorker.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.newyorker.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">The New Yorker</span>
+          <span class="link-desc">Narrativa, saggistica e critica culturale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.theatlantic.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.theatlantic.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">The Atlantic</span>
+          <span class="link-desc">Idee, politica e cultura americana</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.prospectmagazine.co.uk" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.prospectmagazine.co.uk/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">Prospect Magazine</span>
+          <span class="link-desc">Idee, politica e saggistica britannica</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.lrb.co.uk" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lrb.co.uk/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">L</span>
+        <span class="link-text">
+          <span class="link-name">London Review of Books</span>
+          <span class="link-desc">Critica letteraria e saggistica di alta qualità</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.spiegel.de/international" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.spiegel.de/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Der Spiegel International</span>
+          <span class="link-desc">Il settimanale tedesco più influente, in inglese</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.monde-diplomatique.fr" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.monde-diplomatique.fr/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Le Monde Diplomatique</span>
+          <span class="link-desc">Geopolitica e analisi critica internazionale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Geopolitica & Affari Mondiali</div>
+
+      <a class="link-item" href="https://foreignpolicy.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://foreignpolicy.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">Foreign Policy</span>
+          <span class="link-desc">Relazioni internazionali e geopolitica</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.foreignaffairs.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.foreignaffairs.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">Foreign Affairs</span>
+          <span class="link-desc">Il riferimento accademico per le relazioni internazionali</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.economist.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.economist.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">E</span>
+        <span class="link-text">
+          <span class="link-name">The Economist</span>
+          <span class="link-desc">Economia e politica mondiale con rigore analitico</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Scienza</div>
+
+      <a class="link-item" href="https://www.scientificamerican.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.scientificamerican.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Scientific American</span>
+          <span class="link-desc">Divulgazione scientifica autorevole dal 1845</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.nationalgeographic.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.nationalgeographic.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">National Geographic</span>
+          <span class="link-desc">Natura, scienza, esplorazione e fotografia</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.newscientist.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.newscientist.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">New Scientist</span>
+          <span class="link-desc">Scienza e tecnologia, divulgazione accessibile</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       TECH & SCIENZA
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-online" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Tech & Scienza</div>
+        <div class="section-count">Tecnologia, innovazione e ricerca</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Italiane</div>
+
+      <a class="link-item" href="https://www.wired.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.wired.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">W</span>
+        <span class="link-text">
+          <span class="link-name">Wired Italia</span>
+          <span class="link-desc">Tecnologia, cultura digitale e innovazione</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.hwupgrade.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.hwupgrade.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">H</span>
+        <span class="link-text">
+          <span class="link-name">Hardware Upgrade</span>
+          <span class="link-desc">Recensioni hardware, PC e consumer tech</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.tomshw.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.tomshw.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">T</span>
+        <span class="link-text">
+          <span class="link-name">Tom's Hardware Italia</span>
+          <span class="link-desc">Benchmark, guide e notizie hardware</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionali</div>
+
+      <a class="link-item" href="https://www.theverge.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.theverge.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">V</span>
+        <span class="link-text">
+          <span class="link-name">The Verge</span>
+          <span class="link-desc">Tech, gadget e cultura digitale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://arstechnica.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://arstechnica.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">Ars Technica</span>
+          <span class="link-desc">Tech approfondita, scienza e policy digitale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.technologyreview.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.technologyreview.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">MIT Technology Review</span>
+          <span class="link-desc">Innovazione e ricerca dal MIT</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.nature.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.nature.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">Nature</span>
+          <span class="link-desc">La rivista scientifica più autorevole al mondo</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       METEO
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-locale" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Meteo</div>
+        <div class="section-count">Previsioni affidabili e servizi meteorologici</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Servizi Ufficiali</div>
+
+      <a class="link-item" href="https://www.ilmeteo.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilmeteo.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">iLMeteo</span>
+          <span class="link-desc">Previsioni dettagliate per l'Italia</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.3bmeteo.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.3bmeteo.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">3</span>
+        <span class="link-text">
+          <span class="link-name">3B Meteo</span>
+          <span class="link-desc">Previsioni e radar piogge in tempo reale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.meteoam.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.meteoam.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">Aeronautica Militare — Meteo</span>
+          <span class="link-desc">Servizio ufficiale italiano, dati primari</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionali & Avanzati</div>
+
+      <a class="link-item" href="https://www.windy.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.windy.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">W</span>
+        <span class="link-text">
+          <span class="link-name">Windy</span>
+          <span class="link-desc">Mappe animate vento, pioggia e onde globali</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.meteoblue.com/it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.meteoblue.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Meteoblue</span>
+          <span class="link-desc">Modelli previsionali ad alta risoluzione</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.ecmwf.int" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ecmwf.int/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">E</span>
+        <span class="link-text">
+          <span class="link-name">ECMWF</span>
+          <span class="link-desc">Centro europeo previsioni meteo — dati ufficiali</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       SALUTE & MEDICINA
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-mediatv" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Salute & Medicina</div>
+        <div class="section-count">Fonti mediche autorevoli e divulgazione</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Italiane</div>
+
+      <a class="link-item" href="https://www.salute.gov.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.salute.gov.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Ministero della Salute</span>
+          <span class="link-desc">Linee guida, normativa e sanità pubblica</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.issalute.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.issalute.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">I</span>
+        <span class="link-text">
+          <span class="link-name">ISSalute — ISS</span>
+          <span class="link-desc">Istituto Superiore di Sanità, schede verificate</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.airc.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.airc.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">AIRC — Fondazione per la Ricerca sul Cancro</span>
+          <span class="link-desc">Oncologia, ricerca e prevenzione</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionali</div>
+
+      <a class="link-item" href="https://www.who.int" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.who.int/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">W</span>
+        <span class="link-text">
+          <span class="link-name">WHO — World Health Organization</span>
+          <span class="link-desc">Salute globale, linee guida ONU</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.nejm.org" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.nejm.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">New England Journal of Medicine</span>
+          <span class="link-desc">La rivista medica più citata al mondo</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.mayoclinic.org" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.mayoclinic.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Mayo Clinic</span>
+          <span class="link-desc">Enciclopedia medica e sintomi verificati</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.medicalnewstoday.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.medicalnewstoday.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Medical News Today</span>
+          <span class="link-desc">Notizie mediche divulgative con revisione scientifica</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MEDIA & PODCAST
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-mediatv" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Media & Podcast</div>
+        <div class="section-count">Radio online, podcast e analisi dei media</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Podcast & Radio Online — Italia</div>
+
+      <a class="link-item" href="https://www.raiplaysound.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.raiplaysound.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">RaiPlay Sound</span>
+          <span class="link-desc">Tutte le radio RAI e podcast on demand</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.spreaker.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.spreaker.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Spreaker</span>
+          <span class="link-desc">Piattaforma podcast italiana e internazionale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Analisi & Critica dei Media</div>
+
+      <a class="link-item" href="https://www.agendadigitale.eu" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.agendadigitale.eu/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">Agenda Digitale</span>
+          <span class="link-desc">Media, digitale e politica dell'innovazione</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.niemanlab.org" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.niemanlab.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">Nieman Lab</span>
+          <span class="link-desc">Il futuro del giornalismo — ricerca Harvard</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.poynter.org" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.poynter.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">Poynter Institute</span>
+          <span class="link-desc">Etica, fact-checking e formazione giornalistica</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Fact-Checking</div>
+
+      <a class="link-item" href="https://www.pagella-politica.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.pagella-politica.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">Pagella Politica</span>
+          <span class="link-desc">Fact-checking delle dichiarazioni politiche italiane</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://facta.news" target="_blank" rel="noopener">
+        <img class="favicon" src="https://facta.news/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">Facta</span>
+          <span class="link-desc">Contrasto alla disinformazione in italiano</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       POLITICA & DEMOCRAZIA
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-estera" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Politica & Democrazia</div>
+        <div class="section-count">Analisi politica, istituzioni e stato di diritto</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Italia</div>
+
+      <a class="link-item" href="https://www.ilpost.it/politica" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilpost.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">Il Post — Politica</span>
+          <span class="link-desc">Notizie politiche spiegate con rigore e chiarezza</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.linkiesta.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.linkiesta.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">L</span>
+        <span class="link-text">
+          <span class="link-name">Linkiesta</span>
+          <span class="link-desc">Giornale liberal-riformista, politica e cultura</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.rivistailmulino.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rivistailmulino.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Rivista il Mulino</span>
+          <span class="link-desc">Cultura politica riformista, la più autorevole in IT</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.lavoce.info" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lavoce.info/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">V</span>
+        <span class="link-text">
+          <span class="link-name">LaVoce.info</span>
+          <span class="link-desc">Politiche pubbliche basate su evidenza empirica</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.formiche.net" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.formiche.net/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">Formiche</span>
+          <span class="link-desc">Geopolitica, difesa e politica estera italiana</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Europa & Internazionale</div>
+
+      <a class="link-item" href="https://www.socialeurope.eu" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.socialeurope.eu/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Social Europe</span>
+          <span class="link-desc">Think tank socialdemocratico europeo</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.euractiv.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.euractiv.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">E</span>
+        <span class="link-text">
+          <span class="link-name">Euractiv</span>
+          <span class="link-desc">Politica UE: norme, istituzioni e lobbying</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://verfassungsblog.de" target="_blank" rel="noopener">
+        <img class="favicon" src="https://verfassungsblog.de/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">V</span>
+        <span class="link-text">
+          <span class="link-name">Verfassungsblog</span>
+          <span class="link-desc">Diritto costituzionale europeo e stato di diritto</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.democracynow.org" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.democracynow.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">D</span>
+        <span class="link-text">
+          <span class="link-name">Democracy Now!</span>
+          <span class="link-desc">Giornalismo indipendente progressista USA</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       ECONOMIA & LAVORO
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-online" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Economia & Lavoro</div>
+        <div class="section-count">Politiche economiche, sindacato e welfare</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Analisi & Policy — Italia</div>
+
+      <a class="link-item" href="https://www.lavoce.info" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lavoce.info/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">V</span>
+        <span class="link-text">
+          <span class="link-name">LaVoce.info</span>
+          <span class="link-desc">Economia e politiche pubbliche, accademici italiani</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.inps.it/comunicazione/notizie" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.inps.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">I</span>
+        <span class="link-text">
+          <span class="link-name">INPS — Notizie</span>
+          <span class="link-desc">Aggiornamenti ufficiali su previdenza e lavoro</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.cgil.it/news" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.cgil.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">C</span>
+        <span class="link-text">
+          <span class="link-name">CGIL — News</span>
+          <span class="link-desc">Primo sindacato italiano, diritti dei lavoratori</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.sbilanciamoci.info" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.sbilanciamoci.info/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Sbilanciamoci</span>
+          <span class="link-desc">Economia alternativa, fisco e disuguaglianze</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionale</div>
+
+      <a class="link-item" href="https://www.ilo.org/news" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilo.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">I</span>
+        <span class="link-text">
+          <span class="link-name">ILO — International Labour Organization</span>
+          <span class="link-desc">ONU: lavoro dignitoso, diritti e standard globali</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.socialeurope.eu" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.socialeurope.eu/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Social Europe</span>
+          <span class="link-desc">Welfare, mercato del lavoro e modello sociale europeo</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://prospect.org" target="_blank" rel="noopener">
+        <img class="favicon" src="https://prospect.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">The American Prospect</span>
+          <span class="link-desc">Progressismo americano, lavoro ed economia</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://tribunaeconomica.es" target="_blank" rel="noopener">
+        <img class="favicon" src="https://tribunaeconomica.es/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">T</span>
+        <span class="link-text">
+          <span class="link-name">Alternativas Económicas</span>
+          <span class="link-desc">Economia critica e progressista — Spagna</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       AMBIENTE & CLIMA
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-locale" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Ambiente & Clima</div>
+        <div class="section-count">Crisi climatica, ecologia e transizione energetica</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Italiane</div>
+
+      <a class="link-item" href="https://www.rinnovabili.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rinnovabili.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">Rinnovabili.it</span>
+          <span class="link-desc">Energie rinnovabili, clima e sostenibilità</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.vaielettrico.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.vaielettrico.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">V</span>
+        <span class="link-text">
+          <span class="link-name">Vaielettrico</span>
+          <span class="link-desc">Mobilità elettrica e transizione dei trasporti</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.lifegate.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lifegate.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">L</span>
+        <span class="link-text">
+          <span class="link-name">LifeGate</span>
+          <span class="link-desc">Sostenibilità, economia circolare e stili di vita</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.greenreport.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.greenreport.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">G</span>
+        <span class="link-text">
+          <span class="link-name">Greenreport</span>
+          <span class="link-desc">Economia ecologica e ambiente, dal 2003</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionali</div>
+
+      <a class="link-item" href="https://www.theguardian.com/environment" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.theguardian.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">G</span>
+        <span class="link-text">
+          <span class="link-name">The Guardian — Environment</span>
+          <span class="link-desc">Il giornale che più investe nel clima al mondo</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.carbonbrief.org" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.carbonbrief.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">C</span>
+        <span class="link-text">
+          <span class="link-name">Carbon Brief</span>
+          <span class="link-desc">Scienza del clima e policy energetica, UK</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.climatechangenews.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.climatechangenews.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">C</span>
+        <span class="link-text">
+          <span class="link-name">Climate Home News</span>
+          <span class="link-desc">Diplomazia climatica e negoziati internazionali</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.eldiario.es/medioambiente" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.eldiario.es/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">D</span>
+        <span class="link-text">
+          <span class="link-name">elDiario.es — Medio Ambiente</span>
+          <span class="link-desc">Ambiente e clima dal progressismo spagnolo</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.ipcc.ch/news" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ipcc.ch/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">I</span>
+        <span class="link-text">
+          <span class="link-name">IPCC</span>
+          <span class="link-desc">Pannello intergovernativo ONU sui cambiamenti climatici</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       DIRITTI & GIUSTIZIA SOCIALE
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-mediatv" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Diritti & Giustizia Sociale</div>
+        <div class="section-count">Diritti civili, migrazioni e disuguaglianze</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Italiane</div>
+
+      <a class="link-item" href="https://www.altreconomia.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.altreconomia.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">Altreconomia</span>
+          <span class="link-desc">Giornalismo di inchiesta su diritti e giustizia</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.ilmanifesto.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.ilmanifesto.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Il Manifesto</span>
+          <span class="link-desc">Quotidiano storico della sinistra italiana</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.meltingpot.org" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.meltingpot.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Melting Pot Europa</span>
+          <span class="link-desc">Migrazioni, asilo e diritti degli stranieri in IT</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.osservatoriodiritti.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.osservatoriodiritti.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">O</span>
+        <span class="link-text">
+          <span class="link-name">Osservatorio Diritti</span>
+          <span class="link-desc">Diritti umani, minori, migranti e discriminazioni</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionali</div>
+
+      <a class="link-item" href="https://www.hrw.org" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.hrw.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">H</span>
+        <span class="link-text">
+          <span class="link-name">Human Rights Watch</span>
+          <span class="link-desc">Diritti umani nel mondo, report e indagini</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.amnesty.org/en/latest" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.amnesty.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">Amnesty International</span>
+          <span class="link-desc">Difesa dei diritti umani globale dal 1961</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.eldiario.es" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.eldiario.es/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">D</span>
+        <span class="link-text">
+          <span class="link-name">elDiario.es</span>
+          <span class="link-desc">Giornale progressista spagnolo, cooperative di giornalisti</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://jacobin.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://jacobin.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">J</span>
+        <span class="link-text">
+          <span class="link-name">Jacobin</span>
+          <span class="link-desc">Rivista socialista angloamericana di idee</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       FONTI RIFORMISTE
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-nazionale" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Fonti Riformiste</div>
+        <div class="section-count">Socialdemocratico, liberal-progressista, laico</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Riviste & Think Tank — Italia</div>
+
+      <a class="link-item" href="https://www.rivistailmulino.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rivistailmulino.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Rivista il Mulino</span>
+          <span class="link-desc">La più autorevole rivista riformista italiana dal 1951</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.linkiesta.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.linkiesta.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">L</span>
+        <span class="link-text">
+          <span class="link-name">Linkiesta</span>
+          <span class="link-desc">Liberal-riformista, europeista, mercato e diritti</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.lavoce.info" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.lavoce.info/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">V</span>
+        <span class="link-text">
+          <span class="link-name">LaVoce.info</span>
+          <span class="link-desc">Riformismo basato sui dati, accademici indipendenti</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.nuvolarossa.net" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.nuvolarossa.net/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">Nuova Rivista Storica / Unipolis</span>
+          <span class="link-desc">Cultura politica e idee della sinistra riformista</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.italianieuropei.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.italianieuropei.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">I</span>
+        <span class="link-text">
+          <span class="link-name">Italiani Europei</span>
+          <span class="link-desc">Rivista fondata da D'Alema, socialdemocratica ed europeista</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Europa</div>
+
+      <a class="link-item" href="https://www.socialeurope.eu" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.socialeurope.eu/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Social Europe</span>
+          <span class="link-desc">Socialdemocratico europeo, welfare e lavoro</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.progressivepost.eu" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.progressivepost.eu/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">The Progressive Post</span>
+          <span class="link-desc">Media del Partito Socialista Europeo (PES)</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.eldiario.es/opinion" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.eldiario.es/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">D</span>
+        <span class="link-text">
+          <span class="link-name">elDiario.es — Opinión</span>
+          <span class="link-desc">Opinionisti progressisti spagnoli di qualità</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Angloamericano</div>
+
+      <a class="link-item" href="https://newstatesman.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://newstatesman.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">New Statesman</span>
+          <span class="link-desc">Il settimanale laburista britannico dal 1913</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.thenation.com" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.thenation.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">The Nation</span>
+          <span class="link-desc">Il settimanale progressista americano dal 1865</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://dissent.magazine.org" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.dissentmagazine.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">D</span>
+        <span class="link-text">
+          <span class="link-name">Dissent Magazine</span>
+          <span class="link-desc">Socialdemocratica USA, idee e politica dal 1954</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       TELEVISIONI
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-mediatv" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Televisioni</div>
+        <div class="section-count">TV nazionali ed estere — streaming e news live</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">Italia — Pubbliche</div>
+
+      <a class="link-item" href="https://www.raiplay.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.raiplay.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">RaiPlay</span>
+          <span class="link-desc">Tutti i canali RAI in streaming, on demand e diretta</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.rainews.it/dirette/rainews24.html" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rainews.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">RaiNews 24 — Diretta</span>
+          <span class="link-desc">Canale all-news in diretta streaming</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Italia — Private</div>
+
+      <a class="link-item" href="https://tg24.sky.it/diretta-tv" target="_blank" rel="noopener">
+        <img class="favicon" src="https://tg24.sky.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">S</span>
+        <span class="link-text">
+          <span class="link-name">Sky TG24 — Diretta</span>
+          <span class="link-desc">All-news di Sky Italia in streaming live</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.la7.it/dirette-tv" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.la7.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">7</span>
+        <span class="link-text">
+          <span class="link-name">La7 — Diretta</span>
+          <span class="link-desc">Approfondimento, politica e attualità</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.mediasetplay.mediaset.it" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.mediaset.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">M</span>
+        <span class="link-text">
+          <span class="link-name">Mediaset Play</span>
+          <span class="link-desc">Canale 5, Italia 1, Rete 4 — streaming e on demand</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.nove.tv" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.nove.tv/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">9</span>
+        <span class="link-text">
+          <span class="link-name">Nove — Discovery</span>
+          <span class="link-desc">Intrattenimento e informazione, gruppo Discovery</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Europa</div>
+
+      <a class="link-item" href="https://www.bbc.co.uk/iplayer/live/bbcnews" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.bbc.co.uk/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">B</span>
+        <span class="link-text">
+          <span class="link-name">BBC News — Live</span>
+          <span class="link-desc">Canale news della BBC in diretta</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.euronews.com/live" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.euronews.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">E</span>
+        <span class="link-text">
+          <span class="link-name">Euronews — Live</span>
+          <span class="link-desc">TV pan-europea multilingue in diretta</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.rtve.es/play/videos/directo/canales-lineales/1/" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rtve.es/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">RTVE — La 1 en directo</span>
+          <span class="link-desc">Televisione pubblica spagnola in streaming</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.france.tv/france-info" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.france.tv/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">Franceinfo TV</span>
+          <span class="link-desc">All-news della televisione pubblica francese</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.dw.com/en/live-tv/s-9817" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.dw.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">D</span>
+        <span class="link-text">
+          <span class="link-name">DW — Live TV</span>
+          <span class="link-desc">Deutsche Welle in diretta, in inglese</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionale</div>
+
+      <a class="link-item" href="https://www.aljazeera.com/live" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.aljazeera.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">A</span>
+        <span class="link-text">
+          <span class="link-name">Al Jazeera — Live</span>
+          <span class="link-desc">All-news internazionale, punto di vista non occidentale</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://edition.cnn.com/live-tv" target="_blank" rel="noopener">
+        <img class="favicon" src="https://edition.cnn.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">C</span>
+        <span class="link-text">
+          <span class="link-name">CNN International — Live</span>
+          <span class="link-desc">All-news americano in diretta streaming</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.bloomberg.com/live" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.bloomberg.com/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">B</span>
+        <span class="link-text">
+          <span class="link-name">Bloomberg TV — Live</span>
+          <span class="link-desc">Mercati e business in diretta 24h</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       RADIO
+  ═══════════════════════════════════════════ -->
+  <div class="section-card cat-mediatv" data-section>
+    <div class="section-header" onclick="toggleSection(this.parentElement)">
+      <div class="section-meta">
+        <div class="section-title">Radio</div>
+        <div class="section-count">Radio italiane ed estere in streaming</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="links-body">
+
+      <div class="subsection-label">RAI</div>
+
+      <a class="link-item" href="https://www.raiplaysound.it/radio1" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.raiplaysound.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">1</span>
+        <span class="link-text">
+          <span class="link-name">RAI Radio 1</span>
+          <span class="link-desc">Prima rete: notizie, cultura e rubriche</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.raiplaysound.it/radio2" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.raiplaysound.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">2</span>
+        <span class="link-text">
+          <span class="link-name">RAI Radio 2</span>
+          <span class="link-desc">Intrattenimento, musica e programmi pop</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.raiplaysound.it/radio3" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.raiplaysound.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">3</span>
+        <span class="link-text">
+          <span class="link-name">RAI Radio 3</span>
+          <span class="link-desc">Cultura, musica classica e approfondimento</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.raiplaysound.it/radiotek" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.raiplaysound.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">T</span>
+        <span class="link-text">
+          <span class="link-name">Rai Radio Teca</span>
+          <span class="link-desc">Archivio storico della radio pubblica italiana</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Private italiane</div>
+
+      <a class="link-item" href="https://www.radio24.it/diretta" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.radio24.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">2</span>
+        <span class="link-text">
+          <span class="link-name">Radio 24</span>
+          <span class="link-desc">All-news del Sole 24 Ore, economia e attualità</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.radiopopolare.it/ascolta-in-diretta" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.radiopopolare.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">P</span>
+        <span class="link-text">
+          <span class="link-name">Radio Popolare</span>
+          <span class="link-desc">Indipendente, progressista, Milano — giornalismo di qualità</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.radioradicale.it/diretta" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.radioradicale.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">Radio Radicale</span>
+          <span class="link-desc">Parlamento, tribunali e atti istituzionali in diretta</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.rtl.it/live" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rtl.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">RTL 102.5</span>
+          <span class="link-desc">La radio musicale più ascoltata d'Italia</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.rds.it/diretta" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rds.it/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">RDS — Radio Dimensione Suono</span>
+          <span class="link-desc">Musica e intrattenimento, seconda radio IT per ascolti</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <div class="subsection-label">Internazionali</div>
+
+      <a class="link-item" href="https://www.bbc.co.uk/sounds/play/live:bbc_radio_four" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.bbc.co.uk/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">B</span>
+        <span class="link-text">
+          <span class="link-name">BBC Radio 4</span>
+          <span class="link-desc">La radio culturale più autorevole al mondo</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.bbc.co.uk/sounds/play/live:bbc_world_service" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.bbc.co.uk/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">B</span>
+        <span class="link-text">
+          <span class="link-name">BBC World Service</span>
+          <span class="link-desc">Radio internazionale BBC, 24h in inglese</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.rne.es/rne/directo/" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.rtve.es/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">R</span>
+        <span class="link-text">
+          <span class="link-name">RNE — Radio Nacional de España</span>
+          <span class="link-desc">Radio pubblica spagnola, notizie e cultura</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.franceinter.fr/en-direct" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.franceinter.fr/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">F</span>
+        <span class="link-text">
+          <span class="link-name">France Inter</span>
+          <span class="link-desc">Radio pubblica francese generalista di riferimento</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+      <a class="link-item" href="https://www.npr.org/player/live" target="_blank" rel="noopener">
+        <img class="favicon" src="https://www.npr.org/favicon.ico" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="">
+        <span class="favicon-fallback" style="display:none">N</span>
+        <span class="link-text">
+          <span class="link-name">NPR — National Public Radio</span>
+          <span class="link-desc">Radio pubblica americana, giornalismo di qualità</span>
+        </span>
+        <span class="link-arrow">→</span>
+      </a>
+
+    </div>
+  </div>
+
+</main>
+
+<div class="page-footer">
+  💡 Per aggiungere una nuova categoria o un link, modifica il file HTML — ogni sezione inizia con <code>&lt;!-- ══ NOME SEZIONE ══ --&gt;</code>
+</div>
+
+<script>
+  // ── Toggle singola sezione
+  function toggleSection(card) {
+    card.classList.toggle('open');
+  }
+
+  // ── Espandi / Comprimi tutto
+  function expandAll() {
+    document.querySelectorAll('[data-section]').forEach(c => c.classList.add('open'));
+  }
+  function collapseAll() {
+    document.querySelectorAll('[data-section]').forEach(c => c.classList.remove('open'));
+  }
+
+  // ── Ricerca live
+  function filterLinks(query) {
+    const q = query.toLowerCase().trim();
+    document.querySelectorAll('[data-section]').forEach(card => {
+      const links = card.querySelectorAll('.link-item');
+      let anyVisible = false;
+
+      links.forEach(link => {
+        const text = link.textContent.toLowerCase();
+        if (!q || text.includes(q)) {
+          link.classList.remove('hidden');
+          anyVisible = true;
+        } else {
+          link.classList.add('hidden');
+        }
+      });
+
+      card.classList.toggle('search-hidden', !anyVisible && q.length > 0);
+      if (q && anyVisible) card.classList.add('open');
+    });
+  }
+</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
