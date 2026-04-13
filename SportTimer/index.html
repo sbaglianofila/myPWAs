@@ -23,7 +23,6 @@
     --text: #F0EDE8;
     --muted: #555;
     --accent: #FF4D4D;
-    --work-color: #FF4D4D;
     --rest-color: #4D9FFF;
     --warmup-color: #FFB830;
     --cooldown-color: #48CFAD;
@@ -33,7 +32,6 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   html, body { height: 100%; }
 
   body {
@@ -47,13 +45,17 @@
     padding-bottom: var(--safe-bottom);
   }
 
+  /* ══════════════════════════════════
+     HEADER
+  ══════════════════════════════════ */
   header {
     flex-shrink: 0;
-    padding: 16px 24px;
+    padding: 14px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid var(--border);
+    z-index: 10;
   }
 
   .logo {
@@ -63,11 +65,7 @@
   }
   .logo span { color: var(--accent); }
 
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  .header-right { display: flex; align-items: center; gap: 12px; }
 
   .header-sub {
     font-size: 0.7rem;
@@ -76,7 +74,54 @@
     text-transform: uppercase;
   }
 
-  /* install banner */
+  /* Hamburger button — only visible on mobile */
+  #menuBtn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 38px; height: 38px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.2s;
+  }
+  #menuBtn span {
+    display: block;
+    width: 18px; height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all 0.25s;
+  }
+  #menuBtn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  #menuBtn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  #menuBtn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  #menuBtn:active { border-color: var(--accent); }
+
+  /* Selected workout pill in header (mobile only) */
+  #selectedPill {
+    display: none;
+    font-size: 0.7rem;
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-weight: 500;
+    max-width: 130px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ══════════════════════════════════
+     INSTALL BANNER
+  ══════════════════════════════════ */
   #installBanner {
     display: none;
     background: #181818;
@@ -91,26 +136,21 @@
   #installBanner.visible { display: flex; }
   #installBanner strong { color: var(--text); }
   .btn-install {
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 14px;
-    font-size: 0.75rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 6px;
+    padding: 6px 14px; font-size: 0.75rem;
+    font-family: 'DM Sans', sans-serif; font-weight: 500;
+    cursor: pointer; white-space: nowrap;
   }
   .btn-dismiss {
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 1.1rem;
-    cursor: pointer;
-    padding: 0 4px;
+    background: none; border: none;
+    color: var(--muted); font-size: 1.1rem;
+    cursor: pointer; padding: 0 4px;
   }
 
+  /* ══════════════════════════════════
+     MAIN LAYOUT (desktop: 2 columns)
+  ══════════════════════════════════ */
   main {
     flex: 1;
     min-height: 0;
@@ -118,7 +158,9 @@
     grid-template-columns: 300px 1fr;
   }
 
-  /* ── SIDEBAR ── */
+  /* ══════════════════════════════════
+     SIDEBAR (desktop)
+  ══════════════════════════════════ */
   sidebar {
     border-right: 1px solid var(--border);
     padding: 14px;
@@ -151,24 +193,26 @@
     font-size: 0.6rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
+    padding: 4px 10px; border-radius: 4px;
+    cursor: pointer; transition: all 0.2s;
     font-family: 'DM Sans', sans-serif;
   }
   .btn-import:hover { border-color: var(--accent); color: var(--accent); }
 
+  /* ══════════════════════════════════
+     WORKOUT CARDS
+  ══════════════════════════════════ */
   .workout-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     padding: 14px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: border-color 0.2s, background 0.2s;
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
   }
   .workout-card::before {
     content: '';
@@ -176,34 +220,31 @@
     left: 0; top: 0; bottom: 0;
     width: 3px;
     background: var(--card-color, var(--accent));
-    opacity: 0.6;
-    transition: opacity 0.2s;
+    opacity: 0.5;
+    transition: opacity 0.2s, width 0.2s;
   }
-  .workout-card:active { transform: translateX(2px); }
+  .workout-card:active { background: #1c1c1c; }
   .workout-card.active { border-color: var(--card-color, var(--accent)); background: #181818; }
   .workout-card.active::before { opacity: 1; width: 4px; }
 
   .card-name {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.25rem;
-    letter-spacing: 0.08em;
-    margin-bottom: 3px;
+    font-size: 1.2rem; letter-spacing: 0.08em; margin-bottom: 3px;
   }
   .card-desc { font-size: 0.72rem; color: var(--muted); margin-bottom: 8px; }
   .card-meta { display: flex; gap: 8px; font-size: 0.68rem; color: #888; flex-wrap: wrap; }
   .card-tags { display: flex; gap: 6px; margin-top: 7px; }
   .tag {
-    font-size: 0.58rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-weight: 500;
+    font-size: 0.58rem; letter-spacing: 0.1em;
+    text-transform: uppercase; padding: 2px 7px;
+    border-radius: 4px; font-weight: 500;
   }
   .tag-warmup   { background: rgba(255,184,48,0.12); color: var(--warmup-color);  border: 1px solid rgba(255,184,48,0.25); }
   .tag-cooldown { background: rgba(72,207,173,0.12); color: var(--cooldown-color); border: 1px solid rgba(72,207,173,0.25); }
 
-  /* ── TIMER AREA ── */
+  /* ══════════════════════════════════
+     TIMER AREA
+  ══════════════════════════════════ */
   .timer-area {
     display: flex;
     flex-direction: column;
@@ -219,34 +260,24 @@
   .no-selection { text-align: center; }
   .no-selection h2 {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.2rem;
-    letter-spacing: 0.1em;
-    margin-bottom: 8px;
-    color: #2a2a2a;
+    font-size: 2.2rem; letter-spacing: 0.1em;
+    margin-bottom: 8px; color: #2a2a2a;
   }
   .no-selection p { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
 
   /* progress track */
   .progress-track {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    margin-bottom: 24px;
-    width: 100%;
-    max-width: 420px;
+    display: flex; align-items: center; gap: 3px;
+    margin-bottom: 22px; width: 100%; max-width: 420px;
     justify-content: center;
   }
-  .track-seg {
-    height: 4px; border-radius: 2px; flex: 1;
-    background: var(--border); transition: background 0.4s;
-  }
+  .track-seg { height: 4px; border-radius: 2px; flex: 1; background: var(--border); transition: background 0.4s; }
   .track-seg.warmup-seg   { background: rgba(255,184,48,0.25); max-width: 48px; }
   .track-seg.cooldown-seg { background: rgba(72,207,173,0.25); max-width: 48px; }
   .track-seg.done   { background: color-mix(in srgb, var(--phase-color) 45%, transparent); }
   .track-seg.active { background: var(--phase-color); box-shadow: 0 0 6px var(--phase-color); }
   .track-label { font-size: 0.55rem; color: var(--muted); white-space: nowrap; }
 
-  /* segment header */
   .segment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
   .segment-icon {
     width: 26px; height: 26px; border-radius: 50%;
@@ -258,178 +289,179 @@
   }
   .workout-title {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1rem;
-    letter-spacing: 0.2em;
-    color: var(--muted);
-    text-transform: uppercase;
+    font-size: 1rem; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase;
   }
 
-  /* phase badge */
   .phase-badge {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.05rem;
-    letter-spacing: 0.3em;
-    padding: 5px 20px;
-    border-radius: 100px;
-    margin-bottom: 24px;
+    font-size: 1.05rem; letter-spacing: 0.3em;
+    padding: 5px 20px; border-radius: 100px; margin-bottom: 22px;
     transition: all 0.4s;
     background: color-mix(in srgb, var(--phase-color, var(--accent)) 15%, transparent);
     color: var(--phase-color, var(--accent));
     border: 1px solid color-mix(in srgb, var(--phase-color, var(--accent)) 30%, transparent);
   }
 
-  /* ring */
-  .timer-ring-wrap {
-    position: relative;
-    width: 260px; height: 260px;
-    margin-bottom: 28px;
-  }
-  .timer-svg {
-    position: absolute; top: 0; left: 0;
-    transform: rotate(-90deg);
-    width: 260px; height: 260px;
-  }
+  .timer-ring-wrap { position: relative; width: 260px; height: 260px; margin-bottom: 26px; }
+  .timer-svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); width: 260px; height: 260px; }
   .ring-bg { fill: none; stroke: var(--border); stroke-width: 6; }
   .ring-progress {
-    fill: none;
-    stroke: var(--phase-color, var(--accent));
-    stroke-width: 6;
-    stroke-linecap: round;
-    stroke-dasharray: 754;
-    stroke-dashoffset: 0;
+    fill: none; stroke: var(--phase-color, var(--accent));
+    stroke-width: 6; stroke-linecap: round;
+    stroke-dasharray: 754; stroke-dashoffset: 0;
     transition: stroke-dashoffset 0.5s linear, stroke 0.4s ease;
     filter: drop-shadow(0 0 8px var(--phase-color, var(--accent)));
   }
-  .timer-inner {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-  }
-  .time-display {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 5rem;
-    letter-spacing: 0.04em;
-    line-height: 1;
-  }
+  .timer-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .time-display { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; letter-spacing: 0.04em; line-height: 1; }
   .time-display.pulse { animation: pulse 0.5s ease; }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.07); }
-  }
-  .round-info {
-    font-size: 0.7rem;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-top: 5px;
-  }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.07)} }
+  .round-info { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 5px; }
 
-  /* dots */
-  .rounds-dots {
-    display: flex; flex-wrap: wrap; gap: 6px;
-    justify-content: center; max-width: 300px;
-    margin-bottom: 28px;
-  }
+  .rounds-dots { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 300px; margin-bottom: 26px; }
   .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); transition: background 0.3s; }
   .dot.done   { background: var(--phase-color); opacity: 0.4; }
   .dot.active { background: var(--phase-color); box-shadow: 0 0 6px var(--phase-color); }
 
-  /* controls */
   .controls { display: flex; gap: 12px; align-items: center; }
   .btn { font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer; border: none; border-radius: 8px; transition: all 0.18s; -webkit-tap-highlight-color: transparent; }
-  .btn-play {
-    background: var(--accent); color: #fff;
-    padding: 14px 36px; font-size: 0.9rem;
-    letter-spacing: 0.04em;
-  }
+  .btn-play { background: var(--accent); color: #fff; padding: 14px 36px; font-size: 0.9rem; letter-spacing: 0.04em; }
   .btn-play:active { filter: brightness(1.2); transform: scale(0.97); }
-  .btn-secondary {
-    background: var(--surface); color: var(--muted);
-    border: 1px solid var(--border); padding: 12px 18px; font-size: 0.78rem;
-  }
+  .btn-secondary { background: var(--surface); color: var(--muted); border: 1px solid var(--border); padding: 12px 18px; font-size: 0.78rem; }
   .btn-secondary:active { border-color: #444; color: var(--text); }
 
-  /* finished */
   .finished-banner {
     position: absolute; inset: 0;
     background: rgba(10,10,10,0.96);
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     z-index: 10; opacity: 0; pointer-events: none;
-    transition: opacity 0.5s;
-    padding: 32px;
-    text-align: center;
+    transition: opacity 0.5s; padding: 32px; text-align: center;
   }
   .finished-banner.show { opacity: 1; pointer-events: all; }
-  .finished-banner h2 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 3.5rem; letter-spacing: 0.1em;
-    color: var(--accent); margin-bottom: 8px;
-  }
+  .finished-banner h2 { font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 8px; }
   .finished-banner p { color: var(--muted); margin-bottom: 28px; font-size: 0.85rem; line-height: 1.6; }
 
   .phase-transition { animation: flashIn 0.32s ease; }
-  @keyframes flashIn {
-    0% { opacity: 0; transform: scale(0.93); }
-    100% { opacity: 1; transform: scale(1); }
-  }
+  @keyframes flashIn { 0%{opacity:0;transform:scale(0.93)} 100%{opacity:1;transform:scale(1)} }
 
   #fileInput { display: none; }
 
-  /* ── MOBILE ── */
+  /* ══════════════════════════════════
+     MOBILE DRAWER
+  ══════════════════════════════════ */
   @media (max-width: 640px) {
-    body { overflow: auto; }
 
-    main {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
-      height: auto;
-      min-height: 0;
-    }
+    /* Full-screen timer, sidebar hidden by default */
+    main { grid-template-columns: 1fr; }
 
+    #menuBtn    { display: flex; }
+    #selectedPill { display: block; }
+    .header-sub { display: none; }
+
+    /* Sidebar becomes a bottom drawer */
     sidebar {
-      height: auto;
-      max-height: 230px;
-      flex-direction: row;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      overflow-y: hidden;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 75vh;
+      max-height: 75vh;
       border-right: none;
-      border-bottom: 1px solid var(--border);
-      padding: 12px;
-      gap: 10px;
-    }
-    .sidebar-title { display: none; }
-    .workout-card { min-width: 195px; }
+      border-top: 1px solid var(--border);
+      border-radius: 20px 20px 0 0;
+      background: #0e0e0e;
+      z-index: 200;
+      padding: 0 16px 24px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
 
+      /* hidden state */
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.7);
+
+      /* keep in DOM but off-screen */
+      visibility: hidden;
+    }
+
+    sidebar.open {
+      transform: translateY(0);
+      visibility: visible;
+    }
+
+    /* Drag handle */
+    sidebar::before {
+      content: '';
+      display: block;
+      width: 40px; height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 12px auto 16px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-title {
+      position: sticky;
+      top: 0;
+      background: #0e0e0e;
+      padding-top: 4px;
+      padding-bottom: 12px;
+      z-index: 1;
+      margin-bottom: 8px;
+    }
+
+    /* Overlay behind drawer */
+    #drawerOverlay {
+      display: block;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 199;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    #drawerOverlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* Timer area fills full screen */
     .timer-area {
-      height: auto;
-      min-height: calc(100svh - 230px - 57px);
-      overflow-y: visible;
-      justify-content: flex-start;
-      padding-top: 20px;
+      grid-column: 1;
+      height: 100%;
+      padding: 20px 16px 20px;
+      justify-content: center;
     }
 
-    .timer-ring-wrap { width: 220px; height: 220px; }
-    .timer-svg { width: 220px; height: 220px; }
-    .ring-progress { stroke-dasharray: 628; }
-    .time-display { font-size: 4.2rem; }
+    .timer-ring-wrap { width: 230px; height: 230px; }
+    .timer-svg { width: 230px; height: 230px; }
+    .ring-progress { stroke-dasharray: 659; } /* 2π×105 */
+    .time-display { font-size: 4.5rem; }
     .btn-play { padding: 13px 30px; }
+
+    .no-selection h2 { font-size: 2rem; color: #2a2a2a; }
+    .no-selection p { font-size: 0.8rem; }
   }
 </style>
 </head>
 <body>
 
+<!-- Overlay for drawer -->
+<div id="drawerOverlay" onclick="closeDrawer()"></div>
+
 <header>
   <div class="logo">FOR<span>GE</span></div>
   <div class="header-right">
     <div class="header-sub">Workout Timer</div>
+    <div id="selectedPill" onclick="openDrawer()">Scegli workout</div>
+    <button id="menuBtn" onclick="toggleDrawer()" aria-label="Menu allenamenti">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
-<!-- Install prompt banner (Android/Chrome) -->
+<!-- Install banner -->
 <div id="installBanner">
-  <span>📲 <strong>Installa FORGE</strong> come app sul tuo telefono</span>
+  <span>📲 <strong>Installa FORGE</strong> come app</span>
   <div style="display:flex;gap:8px;align-items:center">
     <button class="btn-install" id="installBtn">Installa</button>
     <button class="btn-dismiss" id="dismissBtn">✕</button>
@@ -488,37 +520,56 @@
 <input type="file" id="fileInput" accept=".json" onchange="importJSON(event)">
 
 <script>
-// ─── PWA: Service Worker ──────────────────────────────────────
+// ── PWA: Service Worker ───────────────────────────────────────
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
 }
 
-// ─── PWA: Install prompt (Android/Chrome) ────────────────────
+// ── PWA: Install prompt ───────────────────────────────────────
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
+  e.preventDefault(); deferredPrompt = e;
   document.getElementById('installBanner').classList.add('visible');
 });
 document.getElementById('installBtn').addEventListener('click', async () => {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
+  await deferredPrompt.userChoice;
   deferredPrompt = null;
   document.getElementById('installBanner').classList.remove('visible');
 });
-document.getElementById('dismissBtn').addEventListener('click', () => {
-  document.getElementById('installBanner').classList.remove('visible');
-});
-window.addEventListener('appinstalled', () => {
-  document.getElementById('installBanner').classList.remove('visible');
-});
+document.getElementById('dismissBtn').addEventListener('click', () =>
+  document.getElementById('installBanner').classList.remove('visible'));
+window.addEventListener('appinstalled', () =>
+  document.getElementById('installBanner').classList.remove('visible'));
 
-// ─── CONSTANTS ────────────────────────────────────────────────
-// r=120 → C = 2π×120 ≈ 753.98
-const CIRCUMFERENCE = 2 * Math.PI * 120;
+// ── DRAWER ────────────────────────────────────────────────────
+function openDrawer() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('visible');
+  document.getElementById('menuBtn').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('visible');
+  document.getElementById('menuBtn').classList.remove('open');
+}
+function toggleDrawer() {
+  document.getElementById('sidebar').classList.contains('open') ? closeDrawer() : openDrawer();
+}
+
+// Swipe down to close drawer
+let touchStartY = 0;
+document.getElementById('sidebar').addEventListener('touchstart', e => {
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+document.getElementById('sidebar').addEventListener('touchend', e => {
+  const delta = e.changedTouches[0].clientY - touchStartY;
+  if (delta > 60) closeDrawer(); // swipe down > 60px = close
+}, { passive: true });
+
+// ── CONSTANTS ─────────────────────────────────────────────────
+const CIRCUMFERENCE = 2 * Math.PI * 120; // r=120 → ≈754
 
 const TYPE_WARMUP   = 'warmup';
 const TYPE_WORK     = 'work';
@@ -532,32 +583,24 @@ const PHASE_COLORS = {
   [TYPE_COOLDOWN]: '#48CFAD',
 };
 const PHASE_ICONS = {
-  [TYPE_WARMUP]:   '🌡️',
-  [TYPE_WORK]:     '🔥',
-  [TYPE_REST]:     '💧',
-  [TYPE_COOLDOWN]: '🧊',
+  [TYPE_WARMUP]:'🌡️', [TYPE_WORK]:'🔥', [TYPE_REST]:'💧', [TYPE_COOLDOWN]:'🧊',
 };
 
-// ─── STATE ────────────────────────────────────────────────────
-let workouts = [];
-let selectedWorkout = null;
-let sequence = [];
-let seqIndex = 0;
-let currentRound = 0;
-let timeLeft = 0;
-let phaseDuration = 0;
-let isRunning = false;
-let timerInterval = null;
+// ── STATE ─────────────────────────────────────────────────────
+let workouts = [], selectedWorkout = null;
+let sequence = [], seqIndex = 0, currentRound = 0;
+let timeLeft = 0, phaseDuration = 0;
+let isRunning = false, timerInterval = null;
 
-// ─── SEQUENCE ─────────────────────────────────────────────────
+// ── SEQUENCE ──────────────────────────────────────────────────
 function buildSequence(w) {
   const seq = [];
   if (w.warmup)
-    seq.push({ name: w.warmup.name, duration: w.warmup.duration, type: TYPE_WARMUP, round: 0 });
-  for (let r = 1; r <= w.rounds; r++)
-    w.phases.forEach(p => seq.push({ name: p.name, duration: p.duration, type: p.type, round: r }));
+    seq.push({ name:w.warmup.name, duration:w.warmup.duration, type:TYPE_WARMUP, round:0 });
+  for (let r=1; r<=w.rounds; r++)
+    w.phases.forEach(p => seq.push({ name:p.name, duration:p.duration, type:p.type, round:r }));
   if (w.cooldown)
-    seq.push({ name: w.cooldown.name, duration: w.cooldown.duration, type: TYPE_COOLDOWN, round: 0 });
+    seq.push({ name:w.cooldown.name, duration:w.cooldown.duration, type:TYPE_COOLDOWN, round:0 });
   return seq;
 }
 
@@ -566,7 +609,7 @@ function phaseColor(phase) {
   return PHASE_COLORS[phase.type] || '#FF4D4D';
 }
 
-// ─── INIT ─────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────
 async function init() {
   try {
     const res = await fetch('./workouts.json');
@@ -589,6 +632,9 @@ function defaultWorkouts() {
     { id:"emom", name:"EMOM 10 min", description:"Every Minute On the Minute", color:"#7C4DFF", rounds:10,
       warmup:{name:"Riscaldamento",duration:120}, cooldown:{name:"Defaticamento",duration:120},
       phases:[{name:"Esercizio",duration:40,type:"work"},{name:"Pausa",duration:20,type:"rest"}] },
+    { id:"amrap", name:"AMRAP 20 min", description:"As Many Rounds As Possible", color:"#00C9A7", rounds:1,
+      warmup:{name:"Riscaldamento",duration:180}, cooldown:{name:"Defaticamento",duration:180},
+      phases:[{name:"Lavoro continuo",duration:1200,type:"work"}] },
   ]};
 }
 
@@ -597,7 +643,7 @@ function loadWorkouts(data) {
   renderSidebar();
 }
 
-// ─── SIDEBAR ──────────────────────────────────────────────────
+// ── SIDEBAR ───────────────────────────────────────────────────
 function renderSidebar() {
   const list = document.getElementById('workoutList');
   list.innerHTML = '';
@@ -622,12 +668,12 @@ function renderSidebar() {
         <span>⚡ ${w.phases.length} fasi</span>
       </div>
       ${tags ? `<div class="card-tags">${tags}</div>` : ''}`;
-    card.onclick = () => selectWorkout(w);
+    card.onclick = () => { selectWorkout(w); closeDrawer(); };
     list.appendChild(card);
   });
 }
 
-// ─── SELECT ───────────────────────────────────────────────────
+// ── SELECT ────────────────────────────────────────────────────
 function selectWorkout(w) {
   selectedWorkout = w;
   stopTimer();
@@ -636,10 +682,16 @@ function selectWorkout(w) {
   document.getElementById('noSelection').style.display = 'none';
   document.getElementById('timerUI').style.display = 'flex';
   document.documentElement.style.setProperty('--accent', w.color||'#FF4D4D');
+  // Update header pill
+  const pill = document.getElementById('selectedPill');
+  pill.textContent = w.name;
+  pill.style.color = w.color||'#FF4D4D';
+  pill.style.background = `color-mix(in srgb, ${w.color||'#FF4D4D'} 12%, transparent)`;
+  pill.style.borderColor = `color-mix(in srgb, ${w.color||'#FF4D4D'} 25%, transparent)`;
   resetTimer();
 }
 
-// ─── TIMER ────────────────────────────────────────────────────
+// ── TIMER ─────────────────────────────────────────────────────
 function resetTimer() {
   stopTimer();
   sequence = buildSequence(selectedWorkout);
@@ -652,9 +704,7 @@ function resetTimer() {
 }
 
 function applyPhase(phase) {
-  phaseDuration = phase.duration;
-  timeLeft = phase.duration;
-  currentRound = phase.round;
+  phaseDuration = phase.duration; timeLeft = phase.duration; currentRound = phase.round;
   const color = phaseColor(phase);
   document.documentElement.style.setProperty('--phase-color', color);
   document.getElementById('workoutTitle').textContent = selectedWorkout.name.toUpperCase();
@@ -666,10 +716,8 @@ function applyPhase(phase) {
   if      (phase.type===TYPE_WARMUP)   ri.textContent='RISCALDAMENTO';
   else if (phase.type===TYPE_COOLDOWN) ri.textContent='DEFATICAMENTO';
   else ri.textContent=`Round ${phase.round} / ${selectedWorkout.rounds}`;
-  setTimeDisplay(timeLeft);
-  setRingProgress(1);
-  updateProgressTrack();
-  updateDots();
+  setTimeDisplay(timeLeft); setRingProgress(1);
+  updateProgressTrack(); updateDots();
 }
 
 function toggleTimer() { isRunning ? pauseTimer() : startTimer(); }
@@ -686,25 +734,19 @@ function startTimer() {
 }
 
 function pauseTimer() {
-  isRunning = false;
-  clearInterval(timerInterval);
+  isRunning = false; clearInterval(timerInterval);
   document.getElementById('playBtn').textContent = '▶ RIPRENDI';
 }
 
 function stopTimer() {
-  isRunning = false;
-  clearInterval(timerInterval);
+  isRunning = false; clearInterval(timerInterval);
   document.getElementById('playBtn').textContent = '▶ START';
 }
 
-function skipPhase() {
-  if(!selectedWorkout) return;
-  stopTimer(); advanceSequence();
-}
+function skipPhase() { if(!selectedWorkout) return; stopTimer(); advanceSequence(); }
 
 function advanceSequence() {
-  clearInterval(timerInterval); isRunning=false;
-  seqIndex++;
+  clearInterval(timerInterval); isRunning=false; seqIndex++;
   if(seqIndex>=sequence.length){ showFinished(); return; }
   applyPhase(sequence[seqIndex]);
   document.getElementById('playBtn').textContent='▶ RIPRENDI';
@@ -719,19 +761,17 @@ function showFinished() {
   document.getElementById('finishedBanner').classList.add('show');
 }
 
-// ─── DISPLAY ──────────────────────────────────────────────────
 function setTimeDisplay(secs) {
-  const el = document.getElementById('timeDisplay');
-  const m = Math.floor(secs/60), s = secs%60;
+  const el=document.getElementById('timeDisplay');
+  const m=Math.floor(secs/60), s=secs%60;
   el.textContent = m>0 ? `${m}:${s<10?'0'+s:s}` : (secs<10?'0'+secs:String(secs));
   if(secs<=3&&secs>0){el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');}
 }
 
-function setRingProgress(fraction) {
-  document.getElementById('ringProgress').style.strokeDashoffset = CIRCUMFERENCE*(1-fraction);
+function setRingProgress(f) {
+  document.getElementById('ringProgress').style.strokeDashoffset = CIRCUMFERENCE*(1-f);
 }
 
-// ─── PROGRESS TRACK ───────────────────────────────────────────
 function renderProgressTrack() {
   const c=document.getElementById('progressTrack'); c.innerHTML='';
   const w=selectedWorkout;
@@ -761,13 +801,13 @@ function updateProgressTrack() {
   });
 }
 
-// ─── DOTS ─────────────────────────────────────────────────────
 function renderDots() {
   const c=document.getElementById('roundsDots'); c.innerHTML='';
   const total=Math.min(selectedWorkout.rounds,20);
   for(let i=1;i<=total;i++){const d=document.createElement('div');d.className='dot';d.id=`dot-${i}`;c.appendChild(d);}
   updateDots();
 }
+
 function updateDots() {
   const total=Math.min(selectedWorkout.rounds,20);
   for(let i=1;i<=total;i++){
@@ -778,7 +818,6 @@ function updateDots() {
   }
 }
 
-// ─── IMPORT ───────────────────────────────────────────────────
 function importJSON(event) {
   const file=event.target.files[0]; if(!file) return;
   const reader=new FileReader();
@@ -790,11 +829,9 @@ function importJSON(event) {
       alert(`✅ Importati ${data.workouts.length} allenamenti da ${file.name}`);
     } catch(err){ alert('❌ Errore: '+err.message); }
   };
-  reader.readAsText(file);
-  event.target.value='';
+  reader.readAsText(file); event.target.value='';
 }
 
-// ─── KEYBOARD ─────────────────────────────────────────────────
 document.addEventListener('keydown', e=>{
   if(!selectedWorkout) return;
   if(e.code==='Space'){e.preventDefault();toggleTimer();}
@@ -802,7 +839,6 @@ document.addEventListener('keydown', e=>{
   if(e.code==='ArrowRight') skipPhase();
 });
 
-// ─── GO ───────────────────────────────────────────────────────
 init();
 </script>
 </body>
