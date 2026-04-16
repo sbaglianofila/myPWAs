@@ -1,13 +1,15 @@
 // GymLog Service Worker
-const CACHE_NAME = 'gymlog-v1';
+const CACHE_NAME = 'gymlog-v2';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './routines.json',
+  './programs.json',
+  './programs/push-pull-legs.json',
+  './programs/full-body.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  'https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500;600&display=swap'
+  'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap'
 ];
 
 self.addEventListener('install', e => {

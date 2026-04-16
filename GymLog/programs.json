@@ -1,0 +1,16 @@
+[
+  {
+    "id": "ppl",
+    "name": "Push Pull Legs",
+    "description": "Classico split 3 giorni",
+    "days": 3,
+    "file": "./programs/push-pull-legs.json"
+  },
+  {
+    "id": "fullbody",
+    "name": "Full Body",
+    "description": "Allenamento completo 3×/settimana",
+    "days": 3,
+    "file": "./programs/full-body.json"
+  }
+]

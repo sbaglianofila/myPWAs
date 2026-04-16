@@ -459,6 +459,63 @@ body {
 }
 .add-ss-ex-btn:active { opacity: 1; }
 
+/* ═══════════════════════════════════════════
+   PROGRAM SCREEN
+═══════════════════════════════════════════ */
+.prog-loading { display: flex; justify-content: center; padding: 40px 0; }
+
+.prog-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); margin-bottom: 11px;
+  cursor: pointer; transition: all .15s ease;
+  overflow: hidden; position: relative;
+  -webkit-user-select: none; user-select: none;
+}
+.prog-card::before {
+  content: ''; position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%; background: var(--accent);
+  opacity: 0; transition: opacity .15s;
+}
+.prog-card.active { border-color: var(--accent); }
+.prog-card.active::before { opacity: 1; }
+.prog-card:active { transform: scale(.98); background: var(--surface2); }
+
+.prog-card-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 16px; gap: 12px;
+}
+.prog-name {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 18px; font-weight: 700; margin-bottom: 4px;
+}
+.prog-desc { font-size: 13px; color: var(--muted); }
+.prog-arrow {
+  font-size: 18px; color: var(--muted); flex-shrink: 0;
+}
+.prog-card.active .prog-arrow { color: var(--accent); font-size: 20px; }
+
+/* ── Home program bar ── */
+.home-prog-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 13px 16px;
+}
+.home-prog-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 3px;
+}
+.home-prog-name {
+  font-size: 16px; font-weight: 700; color: var(--text);
+}
+.home-prog-switch {
+  background: var(--surface2); border: 1px solid var(--border);
+  color: var(--muted); font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600;
+  padding: 7px 14px; border-radius: var(--rs); cursor: pointer;
+  transition: all .15s; white-space: nowrap;
+}
+.home-prog-switch:active { border-color: var(--accent); color: var(--accent); }
+
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 </style>
@@ -482,14 +539,27 @@ body {
   </div>
 </header>
 
+<!-- ── PROGRAMS ── -->
+<div class="screen" id="screen-programs">
+  <p class="screen-title">Scegli il programma</p>
+  <div id="programList"></div>
+</div>
+
 <!-- ── HOME ── -->
 <div class="screen active" id="screen-home">
-  <p class="screen-title">Scegli l'allenamento</p>
+  <div class="home-prog-bar">
+    <div class="home-prog-info">
+      <div class="home-prog-label">PROGRAMMA ATTIVO</div>
+      <div class="home-prog-name" id="activeProgramName">—</div>
+    </div>
+    <button class="home-prog-switch" onclick="showProgramScreen()">Cambia</button>
+  </div>
+  <p class="screen-title" style="margin-top:20px">Scegli l'allenamento</p>
   <div class="routine-grid" id="routineGrid"></div>
   <button class="btn-add-routine" onclick="openNewModal()">
     <span style="font-size:18px">＋</span> Nuova routine
   </button>
-  <span class="reset-link" onclick="resetData()">Ripristina routine predefinite</span>
+  <span class="reset-link" onclick="resetData()">Ripristina routine dal file originale</span>
 </div>
 
 <!-- ── WORKOUT ── -->
@@ -549,52 +619,46 @@ body {
 //  CONSTANTS & STATE
 // ═══════════════════════════════════════════
 const SK = 'gymlog_v2';
-const JSON_URL = './routines.json';
+const SK_PROG = 'gymlog_active_program'; // stores { id, name, file }
+const PROGRAMS_URL = './programs.json';
 
 let appData = null;          // { routines: [...] }
+let activeProgram = null;    // { id, name, description, file }
 let currentRoutine = null;
-let checked = {};            // setKey -> bool
+let checked = {};
 let restTimer = null;
 let restLeft = 0;
 let editingId = null;
 let editorItems = [];
 
 // ═══════════════════════════════════════════
-//  BOOT — load JSON then localStorage
+//  BOOT
 // ═══════════════════════════════════════════
 async function boot() {
-  // Date
   const d = new Date();
   const DAYS = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
   const MTHS = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
   document.getElementById('headerDate').textContent =
     `${DAYS[d.getDay()]} ${d.getDate()} ${MTHS[d.getMonth()]}`;
 
-  // Register SW
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
 
-  // Load saved data
-  const saved = loadLocal();
-  if (saved) {
-    appData = saved;
-  } else {
-    // First run: fetch routines.json
-    try {
-      const res = await fetch(JSON_URL + '?v=' + Date.now());
-      const routines = await res.json();
-      appData = { routines };
-      saveLocal();
-    } catch (err) {
-      // Fallback: empty
-      appData = { routines: [] };
-      showToast('⚠ routines.json non trovato. Crea la tua prima routine!');
-    }
-  }
+  // Restore active program from storage
+  try { activeProgram = JSON.parse(localStorage.getItem(SK_PROG)) || null; } catch { activeProgram = null; }
 
-  document.getElementById('loadingScreen').style.display = 'none';
-  renderHome();
+  const saved = loadLocal();
+  if (saved && activeProgram) {
+    // We have both a saved program selection and saved routines — go straight to home
+    appData = saved;
+    document.getElementById('loadingScreen').style.display = 'none';
+    renderHome();
+  } else {
+    // No saved state — show program picker
+    document.getElementById('loadingScreen').style.display = 'none';
+    await showProgramScreen();
+  }
 }
 
 function loadLocal() {
@@ -602,6 +666,73 @@ function loadLocal() {
 }
 function saveLocal() { localStorage.setItem(SK, JSON.stringify(appData)); }
 
+// ═══════════════════════════════════════════
+//  PROGRAM SCREEN
+// ═══════════════════════════════════════════
+async function showProgramScreen() {
+  showScreen('screen-programs');
+  const container = document.getElementById('programList');
+  container.innerHTML = '<div class="prog-loading"><div class="spinner"></div></div>';
+
+  let programs = [];
+  try {
+    const res = await fetch(PROGRAMS_URL + '?v=' + Date.now());
+    programs = await res.json();
+  } catch {
+    container.innerHTML = '<p style="color:var(--muted);font-size:14px;padding:8px 0">⚠ Impossibile caricare programs.json</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  programs.forEach(p => {
+    const isActive = activeProgram && activeProgram.id === p.id;
+    const card = document.createElement('div');
+    card.className = 'prog-card' + (isActive ? ' active' : '');
+    card.innerHTML = `
+      <div class="prog-card-inner">
+        <div>
+          <div class="prog-name">${p.name}</div>
+          <div class="prog-desc">${p.description}${p.days ? ` · ${p.days} giorni` : ''}</div>
+        </div>
+        <div class="prog-arrow">${isActive ? '✓' : '→'}</div>
+      </div>`;
+    card.addEventListener('click', () => loadProgram(p));
+    container.appendChild(card);
+  });
+}
+
+async function loadProgram(p, silent = false) {
+  if (!silent && activeProgram && activeProgram.id === p.id) {
+    // Already loaded, just go to home
+    showScreen('screen-home');
+    renderHome();
+    return;
+  }
+
+  showToast('Caricamento…', 1200);
+
+  try {
+    const res = await fetch(p.file + '?v=' + Date.now());
+    const routines = await res.json();
+    activeProgram = p;
+    appData = { routines };
+    localStorage.setItem(SK_PROG, JSON.stringify(p));
+    saveLocal();
+    document.getElementById('activeProgramName').textContent = p.name;
+    showScreen('screen-home');
+    renderHome();
+    showToast(`✓ ${p.name} caricato`);
+  } catch {
+    showToast(`⚠ Impossibile caricare ${p.file}`);
+  }
+}
+
+async function resetData() {
+  if (!activeProgram) { await showProgramScreen(); return; }
+  if (!confirm(`Ripristinare "${activeProgram.name}" dal file originale?\nLe modifiche manuali andranno perse.`)) return;
+  await loadProgram(activeProgram, true);
+  showToast('✓ Routine ripristinate');
+}
 // ═══════════════════════════════════════════
 //  UTILS
 // ═══════════════════════════════════════════
@@ -623,6 +754,9 @@ function showScreen(id) {
 //  HOME
 // ═══════════════════════════════════════════
 function renderHome() {
+  // Update program name in header
+  document.getElementById('activeProgramName').textContent = activeProgram ? activeProgram.name : '';
+
   const g = document.getElementById('routineGrid');
   g.innerHTML = '';
   appData.routines.forEach(r => {
