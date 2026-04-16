@@ -219,6 +219,12 @@ body {
   color: var(--muted); white-space: nowrap; flex-shrink: 0;
 }
 .ex-tag.dur { border-color: var(--accent2); color: var(--accent2); }
+.ex-alt {
+  font-size: 12px; color: var(--muted);
+  padding: 0 15px 11px;
+  display: flex; align-items: center; gap: 5px;
+}
+.ex-alt-icon { opacity: .5; font-size: 11px; }
 
 /* ── Superset card ── */
 .ss-card {
@@ -855,11 +861,13 @@ function buildExCard(ex) {
   const sHtml = ex.sets.map((s, i) =>
     rowHtml(exDetail(ex.type, s), i, s.id, s.rest || 0)
   ).join('');
+  const altH = ex.alt ? `<div class="ex-alt"><span class="ex-alt-icon">↔</span> alt: ${ex.alt}</div>` : '';
   card.innerHTML = `
     <div class="ex-head">
       <div class="ex-name">${ex.name}</div>
       <div class="ex-tag ${tagC}">${tagL}</div>
     </div>
+    ${altH}
     <div class="sets-list">${sHtml}</div>`;
   return card;
 }
@@ -878,6 +886,7 @@ function buildSsCard(ss) {
     const tagL = ex.type === 'duration' ? '⏱ Durata' : '🔁 Reps';
     html += `<div class="ss-ex-block">`;
     html += `<div class="ss-ex-title">${ex.name}<span class="ss-ex-tag">${tagL}</span></div>`;
+    if (ex.alt) html += `<div class="ex-alt" style="padding:0 15px 6px"><span class="ex-alt-icon">↔</span> alt: ${ex.alt}</div>`;
 
     for (let r = 0; r < ss.rounds; r++) {
       html += `<div class="round-sep"><span>Giro ${r + 1}</span></div>`;
@@ -1058,6 +1067,8 @@ function buildExEdEl(ex, ei) {
       </select>
       <button class="del-btn" onclick="removeItem(${ei})">✕</button>
     </div>
+    <input class="m-input" style="margin-bottom:8px;font-size:13px" placeholder="↔ Alternativa (opz.)"
+      value="${ex.alt||''}" oninput="editorItems[${ei}].alt=this.value.trim()||undefined">
     <div class="ed-sets">${ex.sets.map((s,si) => exSetRow(ei, si, ex.type, s)).join('')}</div>
     <button class="add-set-btn" onclick="addSetEx(${ei})">＋ Serie</button>`;
   return d;
@@ -1077,6 +1088,8 @@ function buildSsEdEl(ss, ei) {
         </select>
         <button class="del-btn" onclick="removeSsEx(${ei},${xi})">✕</button>
       </div>
+      <input class="m-input" style="margin-bottom:7px;font-size:13px" placeholder="↔ Alternativa (opz.)"
+        value="${ex.alt||''}" oninput="editorItems[${ei}].exercises[${xi}].alt=this.value.trim()||undefined">
       <div class="ed-sets">${ex.sets.map((s,si) => ssSetRow(ei, xi, si, ex.type, s)).join('')}</div>
       <button class="add-set-btn" onclick="addSetSsEx(${ei},${xi})">＋ Serie</button>
     </div>`).join('');

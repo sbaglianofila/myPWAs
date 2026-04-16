@@ -8,6 +8,7 @@
         "kind": "exercise",
         "id": "e1",
         "name": "Panca Piana",
+        "alt": "Panca con manubri",
         "type": "reps",
         "sets": [
           { "id": "s1", "reps": 10, "kg": 80, "rest": 120 },
@@ -100,6 +101,7 @@
         "kind": "exercise",
         "id": "e8",
         "name": "Squat",
+        "alt": "Leg Press",
         "type": "reps",
         "sets": [
           { "id": "s21", "reps": 8, "kg": 100, "rest": 180 },

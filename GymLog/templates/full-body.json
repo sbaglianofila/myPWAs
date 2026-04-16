@@ -1,0 +1,149 @@
+[
+  {
+    "id": "fb1",
+    "day": "Lunedì",
+    "name": "Full Body A",
+    "exercises": [
+      {
+        "kind": "exercise",
+        "id": "fba1",
+        "name": "Squat",
+        "type": "reps",
+        "sets": [
+          { "id": "fba1s1", "reps": 8, "kg": 80, "rest": 120 },
+          { "id": "fba1s2", "reps": 8, "kg": 80, "rest": 120 },
+          { "id": "fba1s3", "reps": 8, "kg": 80, "rest": 120 }
+        ]
+      },
+      {
+        "kind": "exercise",
+        "id": "fba2",
+        "name": "Panca Piana",
+        "type": "reps",
+        "sets": [
+          { "id": "fba2s1", "reps": 8, "kg": 70, "rest": 120 },
+          { "id": "fba2s2", "reps": 8, "kg": 70, "rest": 120 },
+          { "id": "fba2s3", "reps": 8, "kg": 70, "rest": 120 }
+        ]
+      },
+      {
+        "kind": "superset",
+        "id": "fbass1",
+        "rounds": 3,
+        "rest": 60,
+        "exercises": [
+          {
+            "id": "fbasse1",
+            "name": "Curl Bicipiti",
+            "type": "reps",
+            "sets": [ { "id": "fbasse1s1", "reps": 12, "kg": 12 } ]
+          },
+          {
+            "id": "fbasse2",
+            "name": "Tricipiti ai Cavi",
+            "type": "reps",
+            "sets": [ { "id": "fbasse2s1", "reps": 12, "kg": 15 } ]
+          }
+        ]
+      },
+      {
+        "kind": "exercise",
+        "id": "fba4",
+        "name": "Plank",
+        "type": "duration",
+        "sets": [
+          { "id": "fba4s1", "duration": 45, "rest": 45 },
+          { "id": "fba4s2", "duration": 45, "rest": 45 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fb2",
+    "day": "Mercoledì",
+    "name": "Full Body B",
+    "exercises": [
+      {
+        "kind": "exercise",
+        "id": "fbb1",
+        "name": "Stacchi",
+        "type": "reps",
+        "sets": [
+          { "id": "fbb1s1", "reps": 6, "kg": 100, "rest": 150 },
+          { "id": "fbb1s2", "reps": 6, "kg": 100, "rest": 150 },
+          { "id": "fbb1s3", "reps": 6, "kg": 100, "rest": 150 }
+        ]
+      },
+      {
+        "kind": "exercise",
+        "id": "fbb2",
+        "name": "Trazioni",
+        "type": "reps",
+        "sets": [
+          { "id": "fbb2s1", "reps": 8, "rest": 120 },
+          { "id": "fbb2s2", "reps": 8, "rest": 120 },
+          { "id": "fbb2s3", "reps": 6, "rest": 120 }
+        ]
+      },
+      {
+        "kind": "exercise",
+        "id": "fbb3",
+        "name": "Military Press",
+        "type": "reps",
+        "sets": [
+          { "id": "fbb3s1", "reps": 10, "kg": 50, "rest": 90 },
+          { "id": "fbb3s2", "reps": 10, "kg": 50, "rest": 90 },
+          { "id": "fbb3s3", "reps": 8,  "kg": 50, "rest": 90 }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fb3",
+    "day": "Venerdì",
+    "name": "Full Body C",
+    "exercises": [
+      {
+        "kind": "exercise",
+        "id": "fbc1",
+        "name": "Affondi",
+        "type": "reps",
+        "sets": [
+          { "id": "fbc1s1", "reps": 10, "kg": 20, "rest": 90 },
+          { "id": "fbc1s2", "reps": 10, "kg": 20, "rest": 90 }
+        ]
+      },
+      {
+        "kind": "superset",
+        "id": "fbcss1",
+        "rounds": 3,
+        "rest": 60,
+        "exercises": [
+          {
+            "id": "fbcsse1",
+            "name": "Alzate Laterali",
+            "type": "reps",
+            "sets": [ { "id": "fbcsse1s1", "reps": 15, "kg": 8 } ]
+          },
+          {
+            "id": "fbcsse2",
+            "name": "Face Pull",
+            "type": "reps",
+            "sets": [ { "id": "fbcsse2s1", "reps": 15, "kg": 12 } ]
+          }
+        ]
+      },
+      {
+        "kind": "exercise",
+        "id": "fbc3",
+        "name": "Crunch",
+        "type": "reps",
+        "sets": [
+          { "id": "fbc3s1", "reps": 20, "rest": 45 },
+          { "id": "fbc3s2", "reps": 20, "rest": 45 },
+          { "id": "fbc3s3", "reps": 15, "rest": 45 }
+        ]
+      }
+    ]
+  }
+]
