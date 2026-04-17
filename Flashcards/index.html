@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FlashCard" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <title>FlashCard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- SCREEN: HOME -->
+  <div id="screen-home" class="screen active">
+    <div class="home-bg"></div>
+
+    <!-- Fixed header -->
+    <div class="home-header">
+      <div class="logo-mark">FC</div>
+      <div>
+        <h1 class="app-title">Flash<span>Card</span></h1>
+        <p class="app-sub">Scegli un mazzo e studia</p>
+      </div>
+    </div>
+
+    <!-- Scrollable body -->
+    <div class="home-body">
+
+      <!-- Deck list (populated from index.json) -->
+      <div id="deck-list-section" class="hidden">
+        <div class="section-label">Mazzi disponibili</div>
+        <div id="deck-list" class="deck-list"></div>
+      </div>
+
+      <!-- Selected deck + actions -->
+      <div id="selected-deck-section" class="hidden">
+        <div class="section-label">Mazzo selezionato</div>
+        <div class="selected-deck-card" id="selected-deck-card">
+          <div class="selected-deck-name" id="deck-name">—</div>
+          <div class="selected-deck-meta">
+            <span class="deck-count" id="deck-count">0 carte</span>
+            <button class="btn-deselect" id="btn-deselect">✕</button>
+          </div>
+        </div>
+        <div class="home-actions">
+          <button class="btn-primary" id="btn-start-normal">Studia</button>
+          <button class="btn-secondary" id="btn-start-quiz">Quiz</button>
+        </div>
+      </div>
+
+      <!-- Manual upload -->
+      <div class="section-label" id="label-upload">Oppure carica un file</div>
+      <div class="upload-zone" id="upload-zone">
+        <div class="upload-icon">⊕</div>
+        <p>Tocca per caricare un JSON</p>
+        <input type="file" id="file-input" accept=".json" />
+      </div>
+
+      <div class="sample-hint">
+        <button class="btn-ghost" id="btn-load-sample">Carica mazzo di esempio</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCREEN: STUDY -->
+  <div id="screen-study" class="screen">
+    <div class="study-header">
+      <button class="btn-icon" id="btn-back">←</button>
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <span class="progress-text" id="progress-text">1 / 1</span>
+      </div>
+      <button class="btn-icon" id="btn-shuffle">⇄</button>
+    </div>
+
+    <div class="card-arena" id="card-arena">
+      <div class="card-container" id="card-container">
+        <div class="card" id="study-card">
+          <div class="card-inner" id="card-inner">
+            <!-- sides injected by JS -->
+          </div>
+          <div class="side-dots" id="side-dots"></div>
+        </div>
+      </div>
+      <div class="swipe-hint" id="swipe-hint">
+        <span>← scorri →</span>
+      </div>
+    </div>
+
+    <div class="study-footer">
+      <button class="btn-nav" id="btn-prev">‹</button>
+      <div class="side-label" id="side-label">Fronte</div>
+      <button class="btn-nav" id="btn-next">›</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: QUIZ -->
+  <div id="screen-quiz" class="screen">
+    <div class="study-header">
+      <button class="btn-icon" id="btn-back-quiz">←</button>
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="quiz-progress-fill"></div></div>
+        <span class="progress-text" id="quiz-progress-text">1 / 1</span>
+      </div>
+      <div class="score-badge" id="score-badge">0</div>
+    </div>
+
+    <div class="quiz-body" id="quiz-body">
+      <div class="quiz-question" id="quiz-question"></div>
+      <div class="quiz-options" id="quiz-options"></div>
+    </div>
+
+    <div class="quiz-footer" id="quiz-footer">
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+      <button class="btn-primary hidden" id="btn-quiz-next">Avanti →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: RESULTS -->
+  <div id="screen-results" class="screen">
+    <div class="results-body">
+      <div class="results-emoji" id="results-emoji">🎉</div>
+      <h2 class="results-title">Quiz completato!</h2>
+      <div class="results-score" id="results-score"></div>
+      <div class="results-detail" id="results-detail"></div>
+      <button class="btn-primary" id="btn-retry">Riprova</button>
+      <button class="btn-ghost" id="btn-home-from-results">Menu principale</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
