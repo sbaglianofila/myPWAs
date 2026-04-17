@@ -1,0 +1,514 @@
+{
+  "workouts": [
+    {
+      "id": "singhiozzo_a",
+      "name": "Singhiozzo A",
+      "description": "Fasi caotiche crescenti e decrescenti — il corpo non riesce mai ad adattarsi",
+      "color": "#FF4D4D",
+      "rounds": 1,
+      "warmup": {
+        "name": "Riscaldamento",
+        "duration": 180
+      },
+      "cooldown": {
+        "name": "Defaticamento",
+        "duration": 180
+      },
+      "phases": [
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 120,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 120,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 180,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 120,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 180,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 240,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 90,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 120,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 180,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 90,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 120,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        }
+      ]
+    },
+    {
+      "id": "singhiozzo_b",
+      "name": "Singhiozzo B",
+      "description": "Blocchi corti con respiri lunghi, poi il contrario — ritmo completamente spezzato",
+      "color": "#FF8C00",
+      "rounds": 1,
+      "warmup": {
+        "name": "Riscaldamento",
+        "duration": 240
+      },
+      "cooldown": {
+        "name": "Defaticamento",
+        "duration": 180
+      },
+      "phases": [
+        {
+          "name": "Intenso",
+          "duration": 90,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 180,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 90,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 240,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 90,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 180,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 180,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 120,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 240,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 90,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 90,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        }
+      ]
+    },
+    {
+      "id": "singhiozzo_c",
+      "name": "Singhiozzo C",
+      "description": "Tre grandi blocchi separati da micro-recuperi — fatica accumulata",
+      "color": "#7C4DFF",
+      "rounds": 1,
+      "warmup": {
+        "name": "Riscaldamento",
+        "duration": 240
+      },
+      "cooldown": {
+        "name": "Defaticamento",
+        "duration": 180
+      },
+      "phases": [
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 120,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 180,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 180,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 240,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 180,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 180,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 90,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 120,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        }
+      ]
+    },
+    {
+      "id": "singhiozzo_d",
+      "name": "Singhiozzo D",
+      "description": "Recuperi lunghissimi alternati a sforzi cortissimi — illusione di riposo",
+      "color": "#00C9A7",
+      "rounds": 1,
+      "warmup": {
+        "name": "Riscaldamento",
+        "duration": 240
+      },
+      "cooldown": {
+        "name": "Defaticamento",
+        "duration": 180
+      },
+      "phases": [
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 240,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 120,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 180,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 240,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 120,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 180,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 240,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 120,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        }
+      ]
+    },
+    {
+      "id": "singhiozzo_e",
+      "name": "Singhiozzo E — Finale",
+      "description": "Parte lenta, esplode nel mezzo, poi di nuovo lenta — curva a campana spezzata",
+      "color": "#FF5E8A",
+      "rounds": 1,
+      "warmup": {
+        "name": "Riscaldamento",
+        "duration": 120
+      },
+      "cooldown": {
+        "name": "Defaticamento",
+        "duration": 120
+      },
+      "phases": [
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 180,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 90,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 120,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 120,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 240,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 180,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 240,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 60,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 120,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 120,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 90,
+          "type": "work"
+        },
+        {
+          "name": "Recupero",
+          "duration": 180,
+          "type": "rest"
+        },
+        {
+          "name": "Intenso",
+          "duration": 60,
+          "type": "work"
+        }
+      ]
+    }
+  ]
+}

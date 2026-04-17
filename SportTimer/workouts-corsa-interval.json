@@ -1,0 +1,126 @@
+{
+  "workouts": [
+    {
+      "id": "it_base",
+      "name": "IT Base — 90/120",
+      "description": "Interval training d'ingresso: 90 secondi intensi, 2 minuti di recupero. Ottimo punto di partenza",
+      "color": "#4D9FFF",
+      "rounds": 7,
+      "warmup":   { "name": "Riscaldamento", "duration": 300 },
+      "cooldown": { "name": "Defaticamento", "duration": 300 },
+      "phases": [
+        { "name": "Fase Intensa",  "duration": 90,  "type": "work" },
+        { "name": "Recupero",      "duration": 120, "type": "rest" }
+      ]
+    },
+    {
+      "id": "it_doppio",
+      "name": "IT Doppio — 60/60",
+      "description": "Rapporto 1:1 su blocchi da 1 minuto, ripetuto 12 volte. Semplice ma brutale",
+      "color": "#FF4D4D",
+      "rounds": 12,
+      "warmup":   { "name": "Riscaldamento", "duration": 300 },
+      "cooldown": { "name": "Defaticamento", "duration": 240 },
+      "phases": [
+        { "name": "Fase Intensa",  "duration": 60,  "type": "work" },
+        { "name": "Recupero",      "duration": 60,  "type": "rest" }
+      ]
+    },
+    {
+      "id": "it_piramide",
+      "name": "Piramidale — 1/2/3/2/1",
+      "description": "Sale e scende: 1→2→3→2→1 minuto intenso con recuperi fissi da 90 secondi",
+      "color": "#FF8C00",
+      "rounds": 1,
+      "warmup":   { "name": "Riscaldamento", "duration": 300 },
+      "cooldown": { "name": "Defaticamento", "duration": 300 },
+      "phases": [
+        { "name": "Intenso 1 min",  "duration": 60,  "type": "work" },
+        { "name": "Recupero",       "duration": 90,  "type": "rest" },
+        { "name": "Intenso 2 min",  "duration": 120, "type": "work" },
+        { "name": "Recupero",       "duration": 90,  "type": "rest" },
+        { "name": "Intenso 3 min",  "duration": 180, "type": "work" },
+        { "name": "Recupero",       "duration": 90,  "type": "rest" },
+        { "name": "Intenso 2 min",  "duration": 120, "type": "work" },
+        { "name": "Recupero",       "duration": 90,  "type": "rest" },
+        { "name": "Intenso 1 min",  "duration": 60,  "type": "work" },
+        { "name": "Recupero",       "duration": 90,  "type": "rest" }
+      ]
+    },
+    {
+      "id": "it_453",
+      "name": "Blocchi 4-5-3",
+      "description": "4 minuti intensi / 3 minuti recupero per 5 round — massimo sviluppo aerobico",
+      "color": "#00C9A7",
+      "rounds": 4,
+      "warmup":   { "name": "Riscaldamento", "duration": 240 },
+      "cooldown": { "name": "Defaticamento", "duration": 180 },
+      "phases": [
+        { "name": "Blocco Intenso",  "duration": 240, "type": "work" },
+        { "name": "Recupero Attivo", "duration": 180, "type": "rest" }
+      ]
+    },
+    {
+      "id": "it_ondulato",
+      "name": "Ondulato — 2/1",
+      "description": "Due minuti intensi, uno di recupero, ripetuti 8 volte. Ritmo ondulatorio continuo",
+      "color": "#C653FF",
+      "rounds": 8,
+      "warmup":   { "name": "Riscaldamento", "duration": 300 },
+      "cooldown": { "name": "Defaticamento", "duration": 240 },
+      "phases": [
+        { "name": "Zona Rossa",  "duration": 120, "type": "work" },
+        { "name": "Recupero",    "duration": 60,  "type": "rest" }
+      ]
+    },
+    {
+      "id": "it_blocchi_31",
+      "name": "Blocchi 3:1 — Duri",
+      "description": "3 minuti intensi / 1 minuto di recupero per 6 round — rapporto lavoro:riposo impegnativo",
+      "color": "#FFB830",
+      "rounds": 6,
+      "warmup":   { "name": "Riscaldamento", "duration": 300 },
+      "cooldown": { "name": "Defaticamento", "duration": 300 },
+      "phases": [
+        { "name": "Blocco Intenso", "duration": 180, "type": "work" },
+        { "name": "Recupero",       "duration": 60,  "type": "rest" }
+      ]
+    },
+    {
+      "id": "it_progressivo",
+      "name": "Progressivo — Scalata",
+      "description": "Ogni blocco cresce di 30 secondi, i recuperi si accorciano. Finisci a tutta",
+      "color": "#48CFAD",
+      "rounds": 1,
+      "warmup":   { "name": "Riscaldamento", "duration": 300 },
+      "cooldown": { "name": "Defaticamento", "duration": 300 },
+      "phases": [
+        { "name": "Blocco 60s",   "duration": 60,  "type": "work" },
+        { "name": "Recupero 90s", "duration": 90,  "type": "rest" },
+        { "name": "Blocco 90s",   "duration": 90,  "type": "work" },
+        { "name": "Recupero 75s", "duration": 75,  "type": "rest" },
+        { "name": "Blocco 120s",  "duration": 120, "type": "work" },
+        { "name": "Recupero 60s", "duration": 60,  "type": "rest" },
+        { "name": "Blocco 150s",  "duration": 150, "type": "work" },
+        { "name": "Recupero 60s", "duration": 60,  "type": "rest" },
+        { "name": "Blocco 180s",  "duration": 180, "type": "work" },
+        { "name": "Recupero 60s", "duration": 60,  "type": "rest" },
+        { "name": "Blocco 240s",  "duration": 240, "type": "work" },
+        { "name": "Recupero 60s", "duration": 60,  "type": "rest" }
+      ]
+    },
+    {
+      "id": "it_long_effort",
+      "name": "Long Effort — 4+2",
+      "description": "Sforzi prolungati da 4 minuti con 2 di recupero completo — simula la gara su distanza",
+      "color": "#FF5E5E",
+      "rounds": 4,
+      "warmup":   { "name": "Riscaldamento", "duration": 300 },
+      "cooldown": { "name": "Defaticamento", "duration": 240 },
+      "phases": [
+        { "name": "Sforzo Sostenuto",  "duration": 240, "type": "work" },
+        { "name": "Recupero Completo", "duration": 120, "type": "rest" }
+      ]
+    }
+  ]
+}

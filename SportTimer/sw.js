@@ -1,8 +1,10 @@
-const CACHE = 'forge-v1';
+const CACHE = 'forge-v2';
 const ASSETS = [
   './index.html',
   './manifest.json',
   './workouts.json',
+  './workouts-ciclismo.json',
+  './workouts-corsa.json',
   'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap'
 ];
 

@@ -1,0 +1,80 @@
+{
+  "workouts": [
+    {
+      "id": "ciclo_soglia",
+      "name": "Soglia Lattato",
+      "description": "Blocchi lunghi a intensità soglia — migliora la potenza aerobica sostenibile",
+      "color": "#FFB830",
+      "rounds": 4,
+      "warmup":   { "name": "Pedalata di Riscaldamento", "duration": 360 },
+      "cooldown": { "name": "Defaticamento in Sella",    "duration": 300 },
+      "phases": [
+        { "name": "Soglia (Z4)",    "duration": 240, "type": "work" },
+        { "name": "Recupero (Z2)", "duration": 120, "type": "rest" }
+      ]
+    },
+    {
+      "id": "ciclo_vo2",
+      "name": "VO2max Intervals",
+      "description": "Ripetute brevi ad altissima intensità per sviluppare il massimo consumo di ossigeno",
+      "color": "#FF4D4D",
+      "rounds": 6,
+      "warmup":   { "name": "Pedalata di Riscaldamento", "duration": 360 },
+      "cooldown": { "name": "Defaticamento in Sella",    "duration": 300 },
+      "phases": [
+        { "name": "Sprint VO2 (Z5)", "duration": 90,  "type": "work" },
+        { "name": "Recupero (Z1)",   "duration": 150, "type": "rest" }
+      ]
+    },
+    {
+      "id": "ciclo_sweet_spot",
+      "name": "Sweet Spot",
+      "description": "Zona 3-4: massimo beneficio con fatica controllata — il cuore del ciclismo di endurance",
+      "color": "#FF8C00",
+      "rounds": 3,
+      "warmup":   { "name": "Pedalata di Riscaldamento", "duration": 300 },
+      "cooldown": { "name": "Defaticamento in Sella",    "duration": 300 },
+      "phases": [
+        { "name": "Sweet Spot (Z3-4)", "duration": 300, "type": "work" },
+        { "name": "Recupero (Z2)",     "duration": 120, "type": "rest" }
+      ]
+    },
+    {
+      "id": "ciclo_sprint",
+      "name": "Sprint & Recover",
+      "description": "Sprint esplosivi da 30 secondi con recupero completo — potenza neuromuscolare",
+      "color": "#FF5E5E",
+      "rounds": 10,
+      "warmup":   { "name": "Pedalata di Riscaldamento", "duration": 420 },
+      "cooldown": { "name": "Defaticamento in Sella",    "duration": 300 },
+      "phases": [
+        { "name": "Sprint (Z6)",    "duration": 60,  "type": "work" },
+        { "name": "Recupero (Z1)", "duration": 120, "type": "rest" }
+      ]
+    },
+    {
+      "id": "ciclo_over_under",
+      "name": "Over & Under",
+      "description": "Alterna sopra e sotto soglia nello stesso blocco — simula gli scatti in gara",
+      "color": "#C653FF",
+      "rounds": 1,
+      "warmup":   { "name": "Pedalata di Riscaldamento", "duration": 300 },
+      "cooldown": { "name": "Defaticamento in Sella",    "duration": 300 },
+      "phases": [
+        { "name": "Under soglia (Z3)", "duration": 120, "type": "work" },
+        { "name": "Over soglia (Z5)",  "duration": 60,  "type": "work" },
+        { "name": "Under soglia (Z3)", "duration": 120, "type": "work" },
+        { "name": "Over soglia (Z5)",  "duration": 60,  "type": "work" },
+        { "name": "Recupero (Z1)",     "duration": 120, "type": "rest" },
+        { "name": "Under soglia (Z3)", "duration": 120, "type": "work" },
+        { "name": "Over soglia (Z5)",  "duration": 90,  "type": "work" },
+        { "name": "Under soglia (Z3)", "duration": 120, "type": "work" },
+        { "name": "Over soglia (Z5)",  "duration": 90,  "type": "work" },
+        { "name": "Recupero (Z1)",     "duration": 120, "type": "rest" },
+        { "name": "Under soglia (Z3)", "duration": 120, "type": "work" },
+        { "name": "Over soglia (Z5)",  "duration": 60,  "type": "work" },
+        { "name": "Recupero (Z1)",     "duration": 60,  "type": "rest" }
+      ]
+    }
+  ]
+}

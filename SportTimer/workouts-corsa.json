@@ -1,0 +1,86 @@
+{
+  "workouts": [
+    {
+      "id": "corsa_ripetute_400",
+      "name": "Ripetute 400m",
+      "description": "Il classico della pista: sforzi brevi ad alta intensità con recupero camminando",
+      "color": "#FF4D4D",
+      "rounds": 8,
+      "warmup":   { "name": "Corsa Lenta + Allunghi", "duration": 360 },
+      "cooldown": { "name": "Corsa Lenta + Stretching", "duration": 300 },
+      "phases": [
+        { "name": "Ritmo Gara (5K)", "duration": 90,  "type": "work" },
+        { "name": "Recupero",        "duration": 90,  "type": "rest" }
+      ]
+    },
+    {
+      "id": "corsa_fartlek",
+      "name": "Fartlek Libero",
+      "description": "Allenamento svedese: variazioni di ritmo libere e imprevedibili su terreno vario",
+      "color": "#4D9FFF",
+      "rounds": 1,
+      "warmup":   { "name": "Corsa Lenta", "duration": 300 },
+      "cooldown": { "name": "Corsa Lenta + Stretching", "duration": 300 },
+      "phases": [
+        { "name": "Ritmo Medio",  "duration": 120, "type": "work" },
+        { "name": "Corsa Lenta",  "duration": 60,  "type": "rest" },
+        { "name": "Accelerazione","duration": 60,  "type": "work" },
+        { "name": "Corsa Lenta",  "duration": 120, "type": "rest" },
+        { "name": "Ritmo Gara",   "duration": 180, "type": "work" },
+        { "name": "Corsa Lenta",  "duration": 90,  "type": "rest" },
+        { "name": "Accelerazione","duration": 60,  "type": "work" },
+        { "name": "Corsa Lenta",  "duration": 60,  "type": "rest" },
+        { "name": "Ritmo Medio",  "duration": 180, "type": "work" },
+        { "name": "Corsa Lenta",  "duration": 90,  "type": "rest" },
+        { "name": "Sprint",       "duration": 60,  "type": "work" },
+        { "name": "Corsa Lenta",  "duration": 120, "type": "rest" }
+      ]
+    },
+    {
+      "id": "corsa_tempi",
+      "name": "Tempo Run",
+      "description": "Corsa prolungata a ritmo soglia — l'allenamento fondamentale per migliorare i PB",
+      "color": "#FF8C00",
+      "rounds": 3,
+      "warmup":   { "name": "Corsa Lenta + Allunghi", "duration": 360 },
+      "cooldown": { "name": "Corsa Lenta + Stretching", "duration": 300 },
+      "phases": [
+        { "name": "Ritmo Soglia",  "duration": 240, "type": "work" },
+        { "name": "Recupero",      "duration": 90,  "type": "rest" }
+      ]
+    },
+    {
+      "id": "corsa_collinare",
+      "name": "Salite Ripetute",
+      "description": "Ripetute in salita per forza e potenza — recupero in discesa o camminando",
+      "color": "#00C9A7",
+      "rounds": 7,
+      "warmup":   { "name": "Corsa Lenta in Piano", "duration": 360 },
+      "cooldown": { "name": "Corsa Lenta + Stretching", "duration": 300 },
+      "phases": [
+        { "name": "Salita (max sforzo)", "duration": 75,  "type": "work" },
+        { "name": "Recupero in Discesa", "duration": 105, "type": "rest" }
+      ]
+    },
+    {
+      "id": "corsa_progressiva",
+      "name": "Progressiva",
+      "description": "Parti lento e accelera ogni blocco — finisci alla massima intensità sostenibile",
+      "color": "#FF5E8A",
+      "rounds": 1,
+      "warmup":   { "name": "Corsa Lenta", "duration": 300 },
+      "cooldown": { "name": "Corsa Lenta + Stretching", "duration": 300 },
+      "phases": [
+        { "name": "Ritmo Z2 (lento)",   "duration": 240, "type": "work" },
+        { "name": "Recupero",            "duration": 60,  "type": "rest" },
+        { "name": "Ritmo Z3 (medio)",   "duration": 180, "type": "work" },
+        { "name": "Recupero",            "duration": 60,  "type": "rest" },
+        { "name": "Ritmo Z4 (soglia)",  "duration": 150, "type": "work" },
+        { "name": "Recupero",            "duration": 60,  "type": "rest" },
+        { "name": "Ritmo Z5 (veloce)",  "duration": 120, "type": "work" },
+        { "name": "Recupero",            "duration": 60,  "type": "rest" },
+        { "name": "Sprint Finale",       "duration": 60,  "type": "work" }
+      ]
+    }
+  ]
+}
