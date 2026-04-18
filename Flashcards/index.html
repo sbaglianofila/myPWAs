@@ -16,54 +16,55 @@
 </head>
 <body>
 
+  <!-- DRAWER OVERLAY -->
+  <div id="drawer-overlay" class="drawer-overlay"></div>
+
+  <!-- DRAWER: lista mazzi -->
+  <div id="drawer" class="drawer">
+    <div class="drawer-header">
+      <span class="drawer-title">Mazzi</span>
+      <button class="btn-icon" id="btn-drawer-close">✕</button>
+    </div>
+    <div id="drawer-list" class="drawer-list"></div>
+  </div>
+
   <!-- SCREEN: HOME -->
   <div id="screen-home" class="screen active">
     <div class="home-bg"></div>
 
-    <!-- Fixed header -->
     <div class="home-header">
       <div class="logo-mark">FC</div>
-      <div>
+      <div class="home-header-text">
         <h1 class="app-title">Flash<span>Card</span></h1>
         <p class="app-sub">Scegli un mazzo e studia</p>
       </div>
+      <button class="btn-hamburger" id="btn-hamburger">
+        <span></span><span></span><span></span>
+      </button>
     </div>
 
-    <!-- Scrollable body -->
     <div class="home-body">
 
-      <!-- Deck list (populated from index.json) -->
-      <div id="deck-list-section" class="hidden">
-        <div class="section-label">Mazzi disponibili</div>
-        <div id="deck-list" class="deck-list"></div>
+      <!-- Empty state -->
+      <div id="home-empty" class="home-empty">
+        <div class="home-empty-icon">🃏</div>
+        <p>Apri il menu <strong>☰</strong> per scegliere un mazzo</p>
       </div>
 
       <!-- Selected deck + actions -->
       <div id="selected-deck-section" class="hidden">
-        <div class="section-label">Mazzo selezionato</div>
         <div class="selected-deck-card" id="selected-deck-card">
-          <div class="selected-deck-name" id="deck-name">—</div>
-          <div class="selected-deck-meta">
-            <span class="deck-count" id="deck-count">0 carte</span>
-            <button class="btn-deselect" id="btn-deselect">✕</button>
+          <div class="selected-deck-badge" id="selected-deck-badge"></div>
+          <div class="selected-deck-info">
+            <div class="selected-deck-name" id="deck-name">—</div>
+            <div class="deck-count" id="deck-count">0 carte</div>
           </div>
+          <button class="btn-deselect" id="btn-deselect">✕</button>
         </div>
         <div class="home-actions">
           <button class="btn-primary" id="btn-start-normal">Studia</button>
           <button class="btn-secondary" id="btn-start-quiz">Quiz</button>
         </div>
-      </div>
-
-      <!-- Manual upload -->
-      <div class="section-label" id="label-upload">Oppure carica un file</div>
-      <div class="upload-zone" id="upload-zone">
-        <div class="upload-icon">⊕</div>
-        <p>Tocca per caricare un JSON</p>
-        <input type="file" id="file-input" accept=".json" />
-      </div>
-
-      <div class="sample-hint">
-        <button class="btn-ghost" id="btn-load-sample">Carica mazzo di esempio</button>
       </div>
 
     </div>

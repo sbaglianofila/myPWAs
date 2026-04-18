@@ -34,37 +34,53 @@ function showScreen(name) {
 }
 
 /* ══════════════════
+   DRAWER
+══════════════════ */
+const drawerEl      = $('drawer');
+const overlayEl     = $('drawer-overlay');
+const drawerListEl  = $('drawer-list');
+
+function openDrawer()  {
+  drawerEl.classList.add('open');
+  overlayEl.classList.add('open');
+}
+function closeDrawer() {
+  drawerEl.classList.remove('open');
+  overlayEl.classList.remove('open');
+}
+
+$('btn-hamburger').addEventListener('click', openDrawer);
+$('btn-drawer-close').addEventListener('click', closeDrawer);
+overlayEl.addEventListener('click', closeDrawer);
+
+/* ══════════════════
    HOME SCREEN
 ══════════════════ */
-const fileInput           = $('file-input');
-const uploadZone          = $('upload-zone');
-const deckListSection     = $('deck-list-section');
-const deckListEl          = $('deck-list');
-const selectedSection     = $('selected-deck-section');
-const deckNameEl          = $('deck-name');
-const deckCountEl         = $('deck-count');
+const selectedSection = $('selected-deck-section');
+const homeEmpty       = $('home-empty');
+const deckNameEl      = $('deck-name');
+const deckCountEl     = $('deck-count');
+const selectedBadgeEl = $('selected-deck-badge');
 
 // ── Load index.json on startup ──
 async function loadIndex() {
   try {
     const res = await fetch('index.json');
-    if (!res.ok) return; // no index.json → silently skip
+    if (!res.ok) return;
     const index = await res.json();
     if (!Array.isArray(index) || index.length === 0) return;
-    renderDeckList(index);
+    renderDrawerList(index);
   } catch {
-    // fetch failed (local file:// or missing) → skip
+    // file:// protocol or missing → silently skip
   }
 }
 
 function deckInitials(name) {
-  // Take up to 2 words, first letter each → "Capitali del Mondo" → "CM"
   const words = name.trim().split(/\s+/).filter(Boolean);
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[words.length - 1][0]).toUpperCase();
 }
 
-// Palette of accent colors cycled by index
 const BADGE_COLORS = [
   ['#e8ff47', '#1a1a0a'],
   ['#47d4ff', '#0a1a1f'],
@@ -74,113 +90,78 @@ const BADGE_COLORS = [
   ['#ff4f6a', '#1f0a0e'],
 ];
 
-function renderDeckList(index) {
-  deckListEl.innerHTML = '';
+function renderDrawerList(index) {
+  drawerListEl.innerHTML = '';
   index.forEach((entry, i) => {
     const [bg, fg] = BADGE_COLORS[i % BADGE_COLORS.length];
     const initials  = deckInitials(entry.name);
     const item = document.createElement('button');
-    item.className = 'deck-list-item';
+    item.className = 'drawer-item';
+    item.dataset.index = i;
     item.innerHTML = `
-      <div class="deck-list-badge" style="background:${bg};color:${fg}">${initials}</div>
-      <div class="deck-list-info">
-        <div class="deck-list-name">${escHtml(entry.name)}</div>
-        <div class="deck-list-meta">${entry.description || (entry.cards ? `${entry.cards} carte` : 'Tocca per caricare')}</div>
+      <div class="drawer-item-badge" style="background:${bg};color:${fg}">${initials}</div>
+      <div class="drawer-item-info">
+        <div class="drawer-item-name">${escHtml(entry.name)}</div>
+        <div class="drawer-item-meta">${entry.description || (entry.cards ? `${entry.cards} carte` : '')}</div>
       </div>
     `;
-    item.addEventListener('click', () => loadDeckFromEntry(entry, item));
-    deckListEl.appendChild(item);
+    item.addEventListener('click', () => loadDeckFromEntry(entry, i));
+    drawerListEl.appendChild(item);
   });
-  deckListSection.classList.remove('hidden');
 }
 
-async function loadDeckFromEntry(entry, itemEl) {
-  // deselect all
-  deckListEl.querySelectorAll('.deck-list-item').forEach(el => el.classList.remove('selected'));
-
+async function loadDeckFromEntry(entry, idx) {
   try {
     const res  = await fetch(entry.file);
-    if (!res.ok) throw new Error('not found');
+    if (!res.ok) throw new Error();
     const data = await res.json();
-    loadDeck(data);
-    itemEl.classList.add('selected');
+    loadDeck(data, idx);
+    closeDrawer();
   } catch {
-    alert(`Impossibile caricare "${entry.file}". Assicurati che il file sia nella stessa cartella di index.html.`);
+    alert(`Impossibile caricare "${entry.file}".`);
   }
 }
 
-// ── Drag & drop ──
-uploadZone.addEventListener('dragover', e => {
-  e.preventDefault();
-  uploadZone.classList.add('drag-over');
-});
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('drag-over');
-  const file = e.dataTransfer?.files?.[0];
-  if (file) loadFile(file);
-});
+function loadDeck(data, badgeIdx = 0) {
+  let d;
+  if (Array.isArray(data))                   d = { name: 'Mazzo', cards: data };
+  else if (data.cards && Array.isArray(data.cards)) d = data;
+  else { alert('Formato JSON non riconosciuto.'); return; }
 
-fileInput.addEventListener('change', e => {
-  const file = e.target.files?.[0];
-  if (file) loadFile(file);
-  fileInput.value = '';
-});
+  const valid = d.cards.filter(c => c.side1);
+  if (valid.length === 0) { alert('Nessuna carta valida.'); return; }
+  d.cards = valid;
+  deck    = d;
+  cards   = [...d.cards];
 
-function loadFile(file) {
-  const reader = new FileReader();
-  reader.onload = ev => {
-    try {
-      const data = JSON.parse(ev.target.result);
-      // deselect any list item (manual load)
-      deckListEl.querySelectorAll('.deck-list-item').forEach(el => el.classList.remove('selected'));
-      loadDeck(data);
-    } catch {
-      alert('Errore: file JSON non valido.');
-    }
-  };
-  reader.readAsText(file);
-}
+  // Update selected card UI
+  const [bg, fg] = BADGE_COLORS[badgeIdx % BADGE_COLORS.length];
+  const initials  = deckInitials(d.name);
+  selectedBadgeEl.textContent   = initials;
+  selectedBadgeEl.style.background = bg;
+  selectedBadgeEl.style.color      = fg;
+  deckNameEl.textContent  = d.name || 'Mazzo';
+  deckCountEl.textContent = `${d.cards.length} ${d.cards.length === 1 ? 'carta' : 'carte'}`;
 
-function loadDeck(data) {
-  if (Array.isArray(data)) {
-    deck = { name: 'Mazzo', cards: data };
-  } else if (data.cards && Array.isArray(data.cards)) {
-    deck = data;
-  } else {
-    alert('Formato JSON non riconosciuto. Vedi README.');
-    return;
-  }
+  // Mark selected in drawer
+  drawerListEl.querySelectorAll('.drawer-item').forEach((el, i) => {
+    el.classList.toggle('selected', i === badgeIdx);
+  });
 
-  const valid = deck.cards.filter(c => c.side1);
-  if (valid.length === 0) {
-    alert('Nessuna carta valida. Ogni carta deve avere almeno "side1".');
-    return;
-  }
-  deck.cards = valid;
-  cards = [...deck.cards];
-
-  deckNameEl.textContent  = deck.name || 'Mazzo';
-  deckCountEl.textContent = `${deck.cards.length} ${deck.cards.length === 1 ? 'carta' : 'carte'}`;
+  homeEmpty.classList.add('hidden');
   selectedSection.classList.remove('hidden');
 }
 
 $('btn-deselect').addEventListener('click', () => {
   deck = null; cards = [];
   selectedSection.classList.add('hidden');
-  deckListEl.querySelectorAll('.deck-list-item').forEach(el => el.classList.remove('selected'));
+  homeEmpty.classList.remove('hidden');
+  drawerListEl.querySelectorAll('.drawer-item').forEach(el => el.classList.remove('selected'));
 });
 
 $('btn-start-normal').addEventListener('click', () => startStudy(false));
 $('btn-start-quiz').addEventListener('click', () => startQuiz());
 
-$('btn-load-sample').addEventListener('click', () => {
-  deckListEl.querySelectorAll('.deck-list-item').forEach(el => el.classList.remove('selected'));
-  loadDeck(SAMPLE_DECK);
-});
-
-// Start loading index on boot
 loadIndex();
 
 /* ══════════════════
