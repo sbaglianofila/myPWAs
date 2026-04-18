@@ -1,45 +1,124 @@
 {
-  "name": "Capitali del Mondo",
+  "name": "Mazzo di Esempio Completo",
 
-  "labels": ["Paese", "Capitale", "Continente", "Curiosità"],
+  "labels": ["Fronte", "Retro", "Extra 1", "Extra 2"],
 
   "cards": [
+
     {
-      "side1": "Italia",
-      "side2": "Roma",
-      "side3": "Europa"
+      "_commento": "── CARTA BASE ──────────────────────────────────────────────────",
+      "_desc": "La carta più semplice: solo fronte e retro. Le label vengono dal mazzo.",
+      "side1": "Qual è la capitale della Francia?",
+      "side2": "Parigi"
     },
+
     {
-      "side1": "Francia",
-      "side2": "Parigi",
-      "side3": "Europa"
-    },
-    {
-      "side1": "Giappone",
-      "side2": "Tokyo",
-      "side3": "Asia",
-      "side4": "東京 in giapponese"
-    },
-    {
-      "side1": "Brasile",
-      "side2": "Brasilia"
-    },
-    {
-      "side1": "Australia",
+      "_commento": "── CARTA CON NOTE ───────────────────────────────────────────────",
+      "_desc": "note1/note2 aggiungono un testo secondario in corsivo sotto il contenuto.",
+      "side1": "Qual è la capitale dell'Australia?",
+      "note1": "Attenzione: non è la città più grande!",
       "side2": "Canberra",
-      "note2": "Non Sydney!"
+      "note2": "Sydney è la più grande, ma non la capitale."
     },
+
     {
-      "side1": "Qual è la capitale del Canada?",
-      "side2": "Ottawa",
+      "_commento": "── CARTA A TRE LATI ─────────────────────────────────────────────",
+      "_desc": "side3 è opzionale. Qui le label vengono dal mazzo (Fronte / Retro / Extra 1).",
+      "side1": "水",
+      "side2": "Acqua",
+      "side3": "みず (mizu)"
+    },
+
+    {
+      "_commento": "── CARTA A QUATTRO LATI ─────────────────────────────────────────",
+      "_desc": "Tutti e quattro i lati attivi. Le label vengono dal mazzo.",
+      "side1": "Dog",
+      "side2": "Cane",
+      "side3": "Hund",
+      "side4": "Perro"
+    },
+
+    {
+      "_commento": "── LABEL PERSONALIZZATE PER CARTA ───────────────────────────────",
+      "_desc": "label1..label4 sovrascrivono le label del mazzo solo per questa carta.",
+      "side1": "Il Rinascimento inizia nel...",
+      "label1": "Domanda",
+      "side2": "XV secolo (circa 1400)",
+      "label2": "Risposta",
+      "side3": "Italia centrale, poi Europa",
+      "label3": "Dove",
+      "side4": "Pittura, scultura, letteratura, scienza",
+      "label4": "Ambiti"
+    },
+
+    {
+      "_commento": "── LABEL PARZIALI ───────────────────────────────────────────────",
+      "_desc": "Puoi sovrascrivere solo alcune label; le altre le prende dal mazzo.",
+      "side1": "H₂O",
+      "label1": "Formula",
+      "side2": "Acqua",
+      "side3": "Molecola polare, solvente universale",
+      "label3": "Proprietà"
+    },
+
+    {
+      "_commento": "── RISPOSTA MULTIPLA AUTOMATICA ─────────────────────────────────",
+      "_desc": "Se NON c'è multiple_choice, il quiz genera i distrattori automaticamente",
+      "_desc2": "usando i side2 delle altre carte del mazzo. Nessuna configurazione.",
+      "side1": "Come si chiama la capitale del Giappone?",
+      "side2": "Tokyo"
+    },
+
+    {
+      "_commento": "── RISPOSTA MULTIPLA MANUALE ────────────────────────────────────",
+      "_desc": "Con multiple_choice definisci tu le opzioni. Esattamente una deve avere",
+      "_desc2": "correct: true. Le opzioni vengono mescolate automaticamente.",
+      "side1": "In quale anno è caduto il Muro di Berlino?",
+      "side2": "1989",
+      "multiple_choice": [
+        { "text": "1989", "correct": true  },
+        { "text": "1991", "correct": false },
+        { "text": "1985", "correct": false },
+        { "text": "1993", "correct": false }
+      ]
+    },
+
+    {
+      "_commento": "── RISPOSTA MULTIPLA + TRE LATI ────────────────────────────────",
+      "_desc": "multiple_choice e lati aggiuntivi coesistono senza problemi.",
+      "_desc2": "In studio vedi tutti i lati; in quiz viene usato solo il multiple_choice.",
+      "side1": "Chi ha dipinto la Cappella Sistina?",
+      "side2": "Michelangelo",
+      "side3": "1508–1512, Vaticano",
       "label1": "Domanda",
       "label2": "Risposta",
+      "label3": "Quando e dove",
       "multiple_choice": [
-        { "text": "Toronto",   "correct": false },
-        { "text": "Ottawa",    "correct": true  },
-        { "text": "Montreal",  "correct": false },
-        { "text": "Vancouver", "correct": false }
+        { "text": "Michelangelo",  "correct": true  },
+        { "text": "Leonardo",      "correct": false },
+        { "text": "Raffaello",     "correct": false },
+        { "text": "Botticelli",    "correct": false }
       ]
+    },
+
+    {
+      "_commento": "── TESTO LUNGO ──────────────────────────────────────────────────",
+      "_desc": "Il testo si adatta automaticamente. Non ci sono limiti di lunghezza,",
+      "_desc2": "ma per le flashcard è meglio restare concisi.",
+      "side1": "Spiega brevemente il principio di indeterminazione di Heisenberg.",
+      "side2": "È impossibile conoscere simultaneamente con precisione arbitraria la posizione e la quantità di moto di una particella. Più precisamente misuriamo l'una, meno precisamente possiamo conoscere l'altra.",
+      "note2": "ΔxΔp ≥ ℏ/2"
+    },
+
+    {
+      "_commento": "── IMMAGINE ─────────────────────────────────────────────────────",
+      "_desc": "image1..image4 accettano un URL https:// di un'immagine.",
+      "_desc2": "Funziona anche con URL di GitHub raw content.",
+      "side1": "Di che monumento si tratta?",
+      "side2": "Torre Eiffel, Parigi (1889)",
+      "image1": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Camponotus_flavomarginatus_ant.jpg/400px-Camponotus_flavomarginatus_ant.jpg",
+      "note2": "Progettata da Gustave Eiffel per l'Esposizione Universale"
     }
+
   ]
 }

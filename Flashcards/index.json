@@ -1,7 +1,7 @@
 [
   {
     "name": "Capitali del Mondo",
-    "file": "esempio.json",
+    "file": "mazzi/esempio.json",
     "description": "Europa, Asia, Americhe",
     "cards": 7
   }
