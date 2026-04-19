@@ -4,5 +4,11 @@
     "file": "mazzi/esempio.json",
     "description": "Europa, Asia, Americhe",
     "cards": 7
-  }
+  },
+  {
+    "name": "Vocabolario",
+    "file": "mazzi/vocabolario.json",
+    "description": "Parole da memorizzare",
+    "cards": 605
+  },
 ]
