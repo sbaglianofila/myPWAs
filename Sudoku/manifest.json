@@ -4,8 +4,8 @@
   "description": "Gioca a Sudoku ovunque, anche offline!",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#9333ea",
+  "background_color": "#0b0b14",
+  "theme_color": "#4d7fff",
   "orientation": "portrait",
   "icons": [
     {
