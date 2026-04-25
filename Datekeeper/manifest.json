@@ -1,7 +1,7 @@
 {
-  "name": "Date Importanti",
-  "short_name": "Date",
-  "description": "Le tue ricorrenze personali sempre a portata di mano",
+  "name": "Datekeeper",
+  "short_name": "Datekeeper",
+  "description": "Le tue date importanti sempre a portata di mano",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f0f1a",
