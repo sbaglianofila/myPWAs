@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "version": "1.0",
+    "description": "Aggiungi qui i tuoi feed RSS. Ogni fonte ha: id univoco, name, emoji, url del feed, enabled (true/false), category."
+  },
+  "categories": [
+    "Notizie",
+    "Economia",
+    "Sport",
+    "Tecnologia",
+    "Cultura",
+    "Locale"
+  ],
+  "sources": [
+    {
+      "id": "ansa",
+      "name": "ANSA",
+      "emoji": "🇮🇹",
+      "url": "https://www.ansa.it/sito/notizie/topnews/topnews_rss.xml",
+      "category": "Notizie",
+      "enabled": true
+    },
+    {
+      "id": "rainews",
+      "name": "RaiNews",
+      "emoji": "📺",
+      "url": "https://www.rainews.it/dl/rainews/media/feed-notizieflash.xml",
+      "category": "Notizie",
+      "enabled": true
+    },
+    {
+      "id": "corriere",
+      "name": "Corriere della Sera",
+      "emoji": "📰",
+      "url": "https://xml2.corriereobjects.it/rss/homepage.xml",
+      "category": "Notizie",
+      "enabled": false
+    },
+    {
+      "id": "repubblica",
+      "name": "la Repubblica",
+      "emoji": "🗞️",
+      "url": "https://www.repubblica.it/rss/homepage/rss2.0.xml",
+      "category": "Notizie",
+      "enabled": false
+    },
+    {
+      "id": "stampa",
+      "name": "La Stampa",
+      "emoji": "🏔️",
+      "url": "https://www.lastampa.it/rss/homepage.xml",
+      "category": "Notizie",
+      "enabled": false
+    },
+    {
+      "id": "tgcom24",
+      "name": "TGcom24",
+      "emoji": "📡",
+      "url": "https://www.tgcom24.mediaset.it/rss/home.xml",
+      "category": "Notizie",
+      "enabled": false
+    },
+    {
+      "id": "sky24",
+      "name": "Sky TG24",
+      "emoji": "🌐",
+      "url": "https://tg24.sky.it/rss/tg24.xml",
+      "category": "Notizie",
+      "enabled": false
+    },
+    {
+      "id": "sole24ore",
+      "name": "Il Sole 24 Ore",
+      "emoji": "💼",
+      "url": "https://www.ilsole24ore.com/rss/mondo.xml",
+      "category": "Economia",
+      "enabled": false
+    },
+    {
+      "id": "wired",
+      "name": "Wired Italia",
+      "emoji": "💡",
+      "url": "https://www.wired.it/feed/rss",
+      "category": "Tecnologia",
+      "enabled": false
+    },
+    {
+      "id": "gazzetta",
+      "name": "La Gazzetta dello Sport",
+      "emoji": "⚽",
+      "url": "https://www.gazzetta.it/rss/calcio.xml",
+      "category": "Sport",
+      "enabled": false
+    },
+    {
+      "id": "corriere_sport",
+      "name": "Corriere dello Sport",
+      "emoji": "🏆",
+      "url": "https://www.corrieredellosport.it/rss",
+      "category": "Sport",
+      "enabled": false
+    }
+  ]
+}

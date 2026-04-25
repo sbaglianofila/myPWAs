@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Edicola">
+<meta name="description" content="Leggi le notizie dai tuoi giornali preferiti">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<title>Edicola</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   EDICOLA — CSS
+═══════════════════════════════════════════════ */
+:root {
+  --ink:    #0a0a0a;
+  --paper:  #f5f0e8;
+  --accent: #E21014;
+  --muted:  #8a8279;
+  --border: #ddd5c8;
+  --card:   #ffffff;
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ─────────────────────────────────── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--ink);
+  padding: calc(var(--safe-top) + 10px) 16px 0;
+  border-bottom: 3px solid var(--accent);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+}
+
+.masthead {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  user-select: none;
+}
+.masthead em {
+  color: var(--accent);
+  font-style: normal;
+}
+
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+.btn-icon {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s;
+  flex-shrink: 0;
+}
+.btn-icon:active { background: rgba(255,255,255,0.22); }
+
+/* ── SOURCE CHIPS ─────────────────────────── */
+.chips-bar {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 10px 0 12px;
+}
+.chips-bar::-webkit-scrollbar { display: none; }
+
+.chip {
+  flex-shrink: 0;
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  line-height: 1;
+}
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.chip:active { transform: scale(0.94); }
+
+/* ── MAIN ───────────────────────────────────── */
+main {
+  padding: 12px 16px calc(var(--safe-bottom) + 88px);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+/* ── SKELETON ───────────────────────────────── */
+.skeleton-list { display: flex; flex-direction: column; gap: 0; }
+.skel-card {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex; gap: 12px;
+}
+.skel {
+  background: linear-gradient(90deg, #e2dbd0 25%, #f0ebe0 50%, #e2dbd0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.skel-body { flex:1; }
+.skel-tag  { height:9px; width:70px; margin-bottom:9px; }
+.skel-t1   { height:15px; width:100%; margin-bottom:5px; }
+.skel-t2   { height:15px; width:75%; margin-bottom:9px; }
+.skel-meta { height:9px; width:90px; }
+.skel-img  { width:78px; height:78px; border-radius:8px; flex-shrink:0; }
+
+/* ── FEED ───────────────────────────────────── */
+.feed { display: flex; flex-direction: column; }
+
+.date-sep {
+  font-size: 0.68rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  padding: 18px 0 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+
+.article-card {
+  display: flex;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.14s;
+}
+.article-card:active { opacity: 0.65; }
+
+.card-body { flex: 1; min-width: 0; }
+
+.card-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.67rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.src-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.0rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-desc {
+  font-size: 0.79rem;
+  color: var(--muted);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.card-meta {
+  font-size: 0.68rem;
+  color: var(--muted);
+}
+
+.card-thumb {
+  flex-shrink: 0;
+  width: 78px; height: 78px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--border);
+  align-self: flex-start;
+  margin-top: 2px;
+}
+.card-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.card-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  background: linear-gradient(135deg, #e8e2d8, #d4cdc0);
+}
+
+/* ── EMPTY STATE ──────────────────────────── */
+.state-msg {
+  text-align: center;
+  padding: 64px 20px;
+  color: var(--muted);
+}
+.state-msg .big { font-size: 3.2rem; margin-bottom: 12px; }
+.state-msg p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.state-msg a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* ── FAB ────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: calc(var(--safe-bottom) + 22px);
+  right: 20px;
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(226,16,20,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 90;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.fab:active { transform: scale(0.91); box-shadow: 0 2px 8px rgba(226,16,20,0.3); }
+.fab svg { transition: transform 0.1s; }
+.fab.spinning svg { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── MODAL SHEET ─────────────────────────── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.52);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.sheet {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #111;
+  border-radius: 22px 22px 0 0;
+  padding: 16px 18px calc(var(--safe-bottom) + 24px);
+  transform: translateY(102%);
+  transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+  max-height: 88dvh;
+  overflow-y: auto;
+  z-index: 201;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+.overlay.open .sheet { transform: translateY(0); }
+
+.sheet-handle {
+  width: 38px; height: 4px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 2px;
+  margin: 0 auto 18px;
+}
+.sheet-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.sheet-subtitle {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.38);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.sheet-subtitle a { color: rgba(255,255,255,0.6); }
+
+/* category group */
+.cat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.28);
+  padding: 14px 0 6px;
+}
+
+.src-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: background 0.18s;
+  background: rgba(255,255,255,0.055);
+}
+.src-item.on { background: rgba(226,16,20,0.14); }
+.src-item:active { background: rgba(255,255,255,0.12); }
+
+.src-emoji { font-size: 1.35rem; width: 34px; text-align:center; flex-shrink:0; }
+.src-info { flex:1; min-width:0; }
+.src-name { font-size:0.88rem; font-weight:500; color:#fff; }
+.src-url  {
+  font-size:0.68rem; color:rgba(255,255,255,0.35);
+  margin-top:1px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+.toggle {
+  width:40px; height:22px;
+  border-radius:11px;
+  background:rgba(255,255,255,0.14);
+  position:relative;
+  flex-shrink:0;
+  transition:background 0.2s;
+  cursor:pointer;
+}
+.toggle.on { background:var(--accent); }
+.toggle::after {
+  content:'';
+  position:absolute;
+  width:18px; height:18px;
+  border-radius:50%;
+  background:#fff;
+  top:2px; left:2px;
+  transition:left 0.2s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.3);
+}
+.toggle.on::after { left:20px; }
+
+/* ── TOAST ──────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: calc(var(--safe-bottom) + 90px);
+  left: 50%;
+  transform: translateX(-50%) translateY(14px);
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-size: 0.81rem;
+  font-weight: 500;
+  z-index: 400;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ── INSTALL BANNER ─────────────────────────── */
+.install-banner {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.install-banner.visible { display: flex; }
+.install-banner strong { font-weight: 600; }
+.install-banner button {
+  margin-left: auto;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+</style>
+</head>
+<body>
+
+<!-- Install Banner (Android) -->
+<div class="install-banner" id="installBanner">
+  <span>📰 <strong>Installa Edicola</strong> — accedi offline</span>
+  <button id="installBtn">Installa</button>
+</div>
+
+<header>
+  <div class="header-top">
+    <div class="masthead">Edi<em>cola</em></div>
+    <div class="header-actions">
+      <button class="btn-icon" id="settingsBtn" aria-label="Gestisci fonti">
+        <!-- settings icon -->
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" y1="6" x2="20" y2="6"/>
+          <line x1="4" y1="12" x2="14" y2="12"/>
+          <line x1="4" y1="18" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div class="chips-bar" id="chipsBar">
+    <button class="chip active" data-filter="all">Tutto</button>
+  </div>
+</header>
+
+<main id="mainContent"></main>
+
+<button class="fab" id="fabRefresh" aria-label="Aggiorna">
+  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+    <path d="M8 16H3v5"/><path d="M16 8h5V3"/>
+  </svg>
+</button>
+
+<!-- Settings Sheet -->
+<div class="overlay" id="overlay">
+  <div class="sheet" id="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">📰 Fonti RSS</div>
+    <div class="sheet-subtitle">
+      Le fonti si gestiscono dal file <a href="feeds.json" target="_blank">feeds.json</a> nel repository.<br>
+      Qui puoi abilitare / disabilitare temporaneamente.
+    </div>
+    <div id="sheetContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  EDICOLA — app.js (inline)
+// ═══════════════════════════════════════════════════════════
+
+// ─── CORS PROXIES ──────────────────────────────────────────
+const PROXIES = [
+  u => `https://api.allorigins.win/get?url=${encodeURIComponent(u)}`,
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+];
+
+// ─── STATE ─────────────────────────────────────────────────
+let ALL_SOURCES = [];     // from feeds.json
+let userPrefs   = {};     // { sourceId: true/false } — saved in localStorage
+let articles    = [];
+let activeFilter = 'all';
+
+// ─── LOAD PREFS ────────────────────────────────────────────
+function loadPrefs() {
+  try { return JSON.parse(localStorage.getItem('edicola_prefs') || '{}'); }
+  catch(e) { return {}; }
+}
+function savePrefs() {
+  localStorage.setItem('edicola_prefs', JSON.stringify(userPrefs));
+}
+
+// Override enabled from userPrefs
+function isEnabled(src) {
+  return src.id in userPrefs ? userPrefs[src.id] : src.enabled;
+}
+
+// ─── FETCH feeds.json ──────────────────────────────────────
+async function loadFeedsConfig() {
+  // cache-bust ogni 10 min
+  const url = `feeds.json?_=${Math.floor(Date.now() / 600000)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('feeds.json non trovato');
+  return res.json();
+}
+
+// ─── FETCH RSS via proxy ───────────────────────────────────
+async function fetchRSS(url, proxyIdx = 0) {
+  if (proxyIdx >= PROXIES.length) throw new Error('Proxy esauriti');
+  try {
+    const r = await fetch(PROXIES[proxyIdx](url), {
+      signal: AbortSignal.timeout(9000)
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+    const raw = data.contents ?? data;
+    return typeof raw === 'string' ? raw : JSON.stringify(raw);
+  } catch(e) {
+    return fetchRSS(url, proxyIdx + 1);
+  }
+}
+
+// ─── PARSE RSS/Atom ────────────────────────────────────────
+function parseXML(xmlStr, srcName, srcEmoji) {
+  const doc = new DOMParser().parseFromString(xmlStr, 'application/xml');
+  if (doc.querySelector('parsererror')) return [];
+  const items = doc.querySelectorAll('item, entry');
+  return Array.from(items).slice(0, 25).map(item => {
+    const get = (...tags) => {
+      for (const t of tags) {
+        const el = item.querySelector(t);
+        if (el) return (el.textContent || '').trim();
+      }
+      return '';
+    };
+    const title = get('title');
+    const link  = item.querySelector('link')?.textContent?.trim()
+               || item.querySelector('link')?.getAttribute('href') || '';
+    const rawDesc = get('description', 'summary', 'content');
+    const desc  = rawDesc.replace(/<[^>]*>/g, '').trim().slice(0, 220);
+    const pub   = get('pubDate', 'published', 'dc\\:date', 'updated');
+
+    // Image extraction
+    let img = '';
+    const encl = item.querySelector('enclosure[type^="image"]');
+    if (encl) img = encl.getAttribute('url') || '';
+    if (!img) {
+      const media = item.querySelector('[url]');
+      if (media) img = media.getAttribute('url') || '';
+    }
+    if (!img) {
+      const m = rawDesc.match(/<img[^>]+src=["']([^"']+)["']/i);
+      if (m) img = m[1];
+    }
+    // Filter out tiny tracking pixels
+    if (img && (img.includes('pixel') || img.includes('track') || img.endsWith('.gif'))) img = '';
+
+    const pubDate = pub ? new Date(pub) : new Date(0);
+    return { title, link, desc, img, pubDate, srcName, srcEmoji };
+  }).filter(a => a.title && a.link);
+}
+
+// ─── LOAD ALL FEEDS ────────────────────────────────────────
+async function loadAllFeeds() {
+  const enabled = ALL_SOURCES.filter(isEnabled);
+  if (!enabled.length) {
+    showState('📭', 'Nessuna fonte attiva.<br>Tocca ☰ e abilita almeno una fonte.');
+    return;
+  }
+  showSkeleton();
+  setSpinning(true);
+
+  const results = await Promise.allSettled(
+    enabled.map(async src => {
+      const xml = await fetchRSS(src.url);
+      return parseXML(xml, src.name, src.emoji);
+    })
+  );
+
+  articles = [];
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled') articles.push(...r.value);
+    else console.warn(`Feed fallito: ${enabled[i].name}`, r.reason?.message);
+  });
+  articles.sort((a, b) => b.pubDate - a.pubDate);
+
+  setSpinning(false);
+  renderFeed();
+  rebuildChips();
+}
+
+// ─── RENDER SKELETON ───────────────────────────────────────
+function showSkeleton() {
+  const main = document.getElementById('mainContent');
+  let html = '<div class="skeleton-list">';
+  for (let i = 0; i < 7; i++) {
+    html += `<div class="skel-card">
+      <div class="skel-body">
+        <div class="skel skel-tag"></div>
+        <div class="skel skel-t1"></div>
+        <div class="skel skel-t2"></div>
+        <div class="skel skel-meta"></div>
+      </div>
+      <div class="skel skel-img"></div>
+    </div>`;
+  }
+  html += '</div>';
+  main.innerHTML = html;
+}
+
+function showState(icon, msg) {
+  document.getElementById('mainContent').innerHTML =
+    `<div class="state-msg"><div class="big">${icon}</div><p>${msg}</p></div>`;
+}
+
+// ─── RENDER FEED ───────────────────────────────────────────
+function renderFeed() {
+  const filtered = activeFilter === 'all'
+    ? articles
+    : articles.filter(a => a.srcName === activeFilter);
+
+  if (!filtered.length) {
+    showState('🔍', 'Nessun articolo trovato.<br>Aggiorna o cambia filtro.');
+    return;
+  }
+
+  const feed = document.createElement('div');
+  feed.className = 'feed';
+  let lastDay = '';
+
+  filtered.forEach(art => {
+    const dayStr = fmtDay(art.pubDate);
+    if (dayStr !== lastDay) {
+      const sep = document.createElement('div');
+      sep.className = 'date-sep';
+      sep.textContent = dayStr;
+      feed.appendChild(sep);
+      lastDay = dayStr;
+    }
+
+    const a = document.createElement('a');
+    a.className = 'article-card';
+    a.href = art.link;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+
+    const thumb = art.img
+      ? `<div class="card-thumb"><img src="${art.img}" alt="" loading="lazy"
+           onerror="this.parentElement.innerHTML='<div class=card-placeholder>${art.srcEmoji}</div>'"></div>`
+      : `<div class="card-thumb"><div class="card-placeholder">${art.srcEmoji}</div></div>`;
+
+    a.innerHTML = `
+      <div class="card-body">
+        <div class="card-source"><span class="src-dot"></span>${art.srcEmoji} ${esc(art.srcName)}</div>
+        <div class="card-title">${esc(art.title)}</div>
+        ${art.desc ? `<div class="card-desc">${esc(art.desc)}</div>` : ''}
+        <div class="card-meta">${fmtTime(art.pubDate)}</div>
+      </div>
+      ${thumb}`;
+
+    feed.appendChild(a);
+  });
+
+  document.getElementById('mainContent').replaceChildren(feed);
+}
+
+// ─── CHIPS ─────────────────────────────────────────────────
+function rebuildChips() {
+  const bar = document.getElementById('chipsBar');
+  // Keep "Tutto" chip, rebuild rest
+  const allChip = bar.querySelector('[data-filter="all"]');
+  bar.replaceChildren(allChip);
+
+  const names = [...new Set(articles.map(a => a.srcName))];
+  names.forEach(name => {
+    const src = ALL_SOURCES.find(s => s.name === name);
+    const btn = document.createElement('button');
+    btn.className = 'chip' + (activeFilter === name ? ' active' : '');
+    btn.dataset.filter = name;
+    btn.textContent = `${src?.emoji || ''} ${name}`;
+    btn.addEventListener('click', () => setFilter(name));
+    bar.appendChild(btn);
+  });
+
+  // Fix "Tutto" active state
+  allChip.classList.toggle('active', activeFilter === 'all');
+}
+
+function setFilter(f) {
+  activeFilter = f;
+  document.querySelectorAll('.chip').forEach(c =>
+    c.classList.toggle('active', c.dataset.filter === f));
+  renderFeed();
+}
+
+// ─── SETTINGS SHEET ────────────────────────────────────────
+function renderSheet() {
+  const container = document.getElementById('sheetContent');
+  container.innerHTML = '';
+
+  // Group by category
+  const cats = {};
+  ALL_SOURCES.forEach(src => {
+    const c = src.category || 'Altro';
+    if (!cats[c]) cats[c] = [];
+    cats[c].push(src);
+  });
+
+  Object.entries(cats).forEach(([cat, srcs]) => {
+    const lbl = document.createElement('div');
+    lbl.className = 'cat-label';
+    lbl.textContent = cat;
+    container.appendChild(lbl);
+
+    srcs.forEach(src => {
+      const on = isEnabled(src);
+      const div = document.createElement('div');
+      div.className = `src-item ${on ? 'on' : ''}`;
+      div.innerHTML = `
+        <div class="src-emoji">${src.emoji}</div>
+        <div class="src-info">
+          <div class="src-name">${esc(src.name)}</div>
+          <div class="src-url">${src.url}</div>
+        </div>
+        <div class="toggle ${on ? 'on' : ''}"></div>`;
+
+      div.querySelector('.toggle').addEventListener('click', e => {
+        e.stopPropagation();
+        userPrefs[src.id] = !isEnabled(src);
+        savePrefs();
+        renderSheet();
+      });
+      container.appendChild(div);
+    });
+  });
+}
+
+// ─── FAB ───────────────────────────────────────────────────
+function setSpinning(v) {
+  document.getElementById('fabRefresh').classList.toggle('spinning', v);
+}
+
+document.getElementById('fabRefresh').addEventListener('click', loadAllFeeds);
+
+// ─── SETTINGS OPEN/CLOSE ───────────────────────────────────
+document.getElementById('settingsBtn').addEventListener('click', () => {
+  renderSheet();
+  document.getElementById('overlay').classList.add('open');
+});
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay'))
+    document.getElementById('overlay').classList.remove('open');
+});
+
+// ─── UTILS ─────────────────────────────────────────────────
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function fmtDay(d) {
+  if (!(d instanceof Date) || isNaN(d)) return 'Data sconosciuta';
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 86400000 && now.getDate() === d.getDate()) return 'Oggi';
+  if (diff < 172800000) return 'Ieri';
+  return d.toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long' });
+}
+function fmtTime(d) {
+  if (!(d instanceof Date) || isNaN(d)) return '';
+  const diff = Date.now() - d;
+  if (diff < 3600000) return `${Math.floor(diff/60000)} min fa`;
+  if (diff < 86400000) return `${Math.floor(diff/3600000)} ore fa`;
+  return d.toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+}
+
+// ─── TOAST ─────────────────────────────────────────────────
+function showToast(msg, ms = 2400) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+}
+
+// ─── PWA INSTALL BANNER (Android) ──────────────────────────
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('visible');
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').classList.remove('visible');
+  if (outcome === 'accepted') showToast('✅ Edicola installata!');
+});
+
+// ─── SERVICE WORKER ────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('SW registrato:', r.scope))
+      .catch(e => console.warn('SW fallito:', e));
+  });
+}
+
+// ─── CHIP "Tutto" listener ─────────────────────────────────
+document.querySelector('[data-filter="all"]').addEventListener('click', () => setFilter('all'));
+
+// ─── BOOT ──────────────────────────────────────────────────
+(async () => {
+  userPrefs = loadPrefs();
+  try {
+    const config = await loadFeedsConfig();
+    ALL_SOURCES = config.sources || [];
+    await loadAllFeeds();
+  } catch(e) {
+    showState('⚠️', `Errore caricamento feeds.json<br><small>${e.message}</small>`);
+    console.error(e);
+  }
+})();
+</script>
+</body>
+</html>
