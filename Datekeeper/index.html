@@ -51,8 +51,27 @@
     font-weight: 300;
     letter-spacing: 0.5px;
     text-transform: uppercase;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 16px;
   }
+  .install-btn {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    border: 1.5px solid var(--accent);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--accent);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .install-btn:active { opacity: 0.7; }
   .tabs {
     display: flex;
     gap: 4px;
@@ -465,8 +484,13 @@
 <body>
 
 <div class="header">
-  <div class="app-title">Date Importanti</div>
-  <div class="app-subtitle">Le tue ricorrenze personali</div>
+  <div class="header-top">
+    <div>
+      <div class="app-title">Date Importanti</div>
+      <div class="app-subtitle">Le tue ricorrenze personali</div>
+    </div>
+    <button id="installBtn" class="install-btn" style="display:none" onclick="installApp()">&#8681; Installa</button>
+  </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('calendar')">Calendario</button>
     <button class="tab-btn" onclick="switchTab('list')">Lista</button>
@@ -871,6 +895,23 @@ init();
 <script>
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 navigator.storage.persist().catch(()=>{});
+
+let _installPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _installPrompt = e;
+  document.getElementById('installBtn').style.display = 'flex';
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBtn').style.display = 'none';
+  _installPrompt = null;
+});
+async function installApp() {
+  if (!_installPrompt) return;
+  _installPrompt.prompt();
+  const { outcome } = await _installPrompt.userChoice;
+  if (outcome === 'accepted') _installPrompt = null;
+}
 </script>
 </body>
 </html>
