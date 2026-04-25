@@ -560,7 +560,7 @@ const DAY_NAMES   = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
 const MONTH_NAMES = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
                      'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 
-let events         = JSON.parse(localStorage.getItem('date_importanti')||'[]');
+let events         = [];
 let currentTab     = 'calendar';
 let currentFilter  = 'all';
 let calDate        = new Date();
@@ -569,7 +569,51 @@ let currentDetailId= null;
 let selectedCat    = null;
 let selectedRepeat = 'yearly';
 
-function saveData(){ localStorage.setItem('date_importanti', JSON.stringify(events)); }
+// IndexedDB — dati persistono anche dopo la pulizia della cache di Chrome
+const IDB_NAME = 'datekeeper';
+const IDB_STORE = 'events';
+let _db = null;
+
+function openDB() {
+  if (_db) return Promise.resolve(_db);
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
+    req.onsuccess = e => { _db = e.target.result; resolve(_db); };
+    req.onerror   = e => reject(e.target.error);
+  });
+}
+
+async function loadData() {
+  try {
+    const db = await openDB();
+    const data = await new Promise((resolve, reject) => {
+      const req = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get('list');
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror   = e => reject(e.target.error);
+    });
+    if (data) return data;
+    // Migrazione automatica da localStorage (prima esecuzione)
+    const ls = localStorage.getItem('date_importanti');
+    const migrated = ls ? JSON.parse(ls) : [];
+    if (migrated.length) { await saveData(migrated); localStorage.removeItem('date_importanti'); }
+    return migrated;
+  } catch { return []; }
+}
+
+async function saveData(data) {
+  const list = data !== undefined ? data : events;
+  try {
+    const db = await openDB();
+    await new Promise((resolve, reject) => {
+      const tx  = db.transaction(IDB_STORE, 'readwrite');
+      const req = tx.objectStore(IDB_STORE).put(list, 'list');
+      req.onsuccess = resolve;
+      req.onerror   = e => reject(e.target.error);
+    });
+  } catch (e) { console.error('Salvataggio fallito', e); }
+}
+
 function getCat(id){ return CATEGORIES.find(c=>c.id===id)||CATEGORIES[0]; }
 
 function getNextOccurrence(ev){
@@ -816,7 +860,12 @@ document.querySelectorAll('.modal-overlay').forEach(o=>{
 });
 
 function render(){ renderFilters(); if(currentTab==='calendar')renderCalendar(); else renderList(); }
-render();
+
+async function init() {
+  events = await loadData();
+  render();
+}
+init();
 </script>
 
 <script>
