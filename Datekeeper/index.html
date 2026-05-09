@@ -894,7 +894,14 @@ init();
 
 <script>
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
-navigator.storage.persist().catch(()=>{});
+
+// Richiede storage persistente: impedisce al browser di svuotare IndexedDB
+// sotto pressione di memoria. Come TWA/APK i dati sono comunque isolati da Chrome.
+if (navigator.storage && navigator.storage.persist) {
+  navigator.storage.persist().then(granted => {
+    if (!granted) console.warn('[Datekeeper] Storage persistente non garantito dal browser.');
+  }).catch(() => {});
+}
 
 let _installPrompt = null;
 window.addEventListener('beforeinstallprompt', e => {

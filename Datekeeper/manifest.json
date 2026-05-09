@@ -1,13 +1,15 @@
 {
+  "id": "https://sbaglianofila.github.io/myPWAs/Datekeeper/",
   "name": "Datekeeper",
   "short_name": "Datekeeper",
   "description": "Le tue date importanti sempre a portata di mano",
-  "start_url": "/myPWAs/Datekeeper/",
-  "scope": "/myPWAs/Datekeeper/",
+  "start_url": "https://sbaglianofila.github.io/myPWAs/Datekeeper/",
+  "scope": "https://sbaglianofila.github.io/myPWAs/Datekeeper/",
   "display": "standalone",
   "background_color": "#0f0f1a",
   "theme_color": "#1a1a2e",
   "orientation": "portrait",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "icon-192.png",
