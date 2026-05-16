@@ -7,6 +7,13 @@
     "file": "./programs/push-pull-legs.json"
   },
   {
+    "id": "k01",
+    "name": "Full Body 01",
+    "description": "Completo 3gg/Sett + 1",
+    "days": 4,
+    "file": "./programs/full-body01.json"
+  },
+  {
     "id": "fullbody",
     "name": "Full Body",
     "description": "Allenamento completo 3×/settimana",
